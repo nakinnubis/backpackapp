@@ -1,0 +1,5 @@
+﻿CREATE SEQUENCE [dbo].[ticket_number]
+    AS BIGINT
+    START WITH 1000000000
+    INCREMENT BY 1;
+
