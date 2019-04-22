@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Linq;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Core.Api.Models;
 using Core.Web.Models;
 using System.IO;
 using Core.Api.Helper;
+using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Core.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors("AllowOrigin")]
     public class BookingController : Controller
     {
         AppDbContext db = new AppDbContext();
@@ -52,7 +54,7 @@ namespace Core.Api.Controllers
 
         //[HttpPost]
         //[Route("sendMessage")]
-        //[Authorize]
+        //
         //public IActionResult sendMessage([FromBody]MessageModel messageModel, int ticketid)
         //{
         //    int userid = int.Parse(HttpContext.User.FindFirst("userId").Value); //fromUser
@@ -72,7 +74,7 @@ namespace Core.Api.Controllers
 
         //[HttpPost]
         //[Route("sendMessageForAll")]
-        //[Authorize]
+        //
         //public IActionResult sendMessageForAll([FromBody]MessageModel messageModel, int availabilityId)
         //{
         //    var tickets = db.Booking_Ticket.Include(x => x.Booking).Where(x => x.Booking.avaliability_id == availabilityId)
@@ -315,7 +317,7 @@ namespace Core.Api.Controllers
         }
         #region 
         //[Route("GetBookingDetailsByTicketNo")]
-        //[Authorize]
+        //
         //public IActionResult GetBookingDetailsByTicketNo(int ticketNo)
         //{
         //    var bookingid = db.Booking_Ticket.Where(x => x.ticket_number == ticketNo).Select(x => x.booking_id).First();
@@ -443,9 +445,9 @@ namespace Core.Api.Controllers
                 return NoContent();
         }
 
-
+        [HttpGet]
         [Route("GetBookingDetails")]
-        //[Authorize]
+        [Authorize]
         public IActionResult GetBookingDetails(int Bookingid, long ticketNo)
         {
             int? bookingid;

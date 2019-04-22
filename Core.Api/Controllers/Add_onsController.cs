@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Core.Web.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Core.Api.Controllers
@@ -9,6 +10,7 @@ namespace Core.Api.Controllers
     [Produces("application/json")]
     [Route("api/Add_ons")]
     [ApiController]
+    [EnableCors("AllowOrigin")]
     public class Add_ons : ControllerBase
     {
         AppDbContext db = new AppDbContext();
@@ -32,7 +34,7 @@ namespace Core.Api.Controllers
             }
             return BadRequest(new { message = "Check Data ,Please" });
         }
-
+        
         [Authorize]
         [Route("GetAllAdd_Ons")]
         public IActionResult GetAllAdd_Ons()

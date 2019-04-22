@@ -10,13 +10,14 @@ using Microsoft.EntityFrameworkCore;
 using Core.Web.Models;
 using System.Drawing;
 using GeoCoordinatePortable;
+using Microsoft.AspNetCore.Cors;
 
 namespace Core.Api.Controllers
 {
     [Produces("application/json")]
     [Route("api/customer")]
     [ApiController]
-
+    [EnableCors("AllowOrigin")]
     public class CustomerController : BaseController
     {
         AppDbContext db = new AppDbContext();
@@ -850,7 +851,7 @@ namespace Core.Api.Controllers
             db.SaveChanges();
             return Ok();
         }
-       
+
 
         [Authorize]
         [Route("GetUserDisease")]
@@ -932,7 +933,7 @@ namespace Core.Api.Controllers
 
 
         //[HttpPost]
-        //[Authorize]
+        //
         //[Route("send_message")]
         //public IActionResult send_message([FromBody]MessageReply messageReply, int ticketId)  //*
         //{

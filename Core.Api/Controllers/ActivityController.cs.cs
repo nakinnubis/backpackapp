@@ -11,12 +11,13 @@ using Microsoft.AspNetCore.Hosting;
 using Core.Web.Models;
 using Core.Api.Models;
 using Core.Api.Helper;
+using Microsoft.AspNetCore.Cors;
 
 namespace Core.Api.Controllers
 {
     [Route("api/Activity")]
     [ApiController]
-
+    [EnableCors("AllowOrigin")]
     public class ActivityController : BaseController// ControllerBase
     {
         private readonly IHostingEnvironment _hostingEnvironment;
@@ -68,8 +69,9 @@ namespace Core.Api.Controllers
         /// To get all Upcoming Activity related to current user which not deleted and completed .
         /// </summary>
         /// <returns></returns>
-        [Authorize]
+        
         [Route("UpcomingActivity")]
+        [Authorize]
         public IActionResult UpcomingActivity()
         {
             int userId = GetUserId();
@@ -176,7 +178,7 @@ namespace Core.Api.Controllers
         /// <param name="activityid"></param>
         /// <returns> online activity url  </returns>
         [Route("GetActivityReview")]
-        [Authorize]
+        
         public IActionResult GetActivityReview(int activityid)
         {
             var activities = db.Reviews.Include(x => x.Activity)
@@ -429,7 +431,7 @@ namespace Core.Api.Controllers
 
         // create Individual Category of activity
         //[HttpPost]
-        //[Authorize]
+        //
         //[Route("createIndividualCategory")]
         //public IActionResult createIndividualCategory([FromBody] IndividualCategory individualCategory)
         //{
@@ -491,7 +493,7 @@ namespace Core.Api.Controllers
             return Ok(new { status = 0, message = "Activity Folder not found" });
         }
 
-        
+
         //delete photo of activity from (app) and delete directory if not find any remaining photos 
         [Authorize]
         [Route("DeleteActivityPhoto")]
@@ -892,7 +894,7 @@ namespace Core.Api.Controllers
 
 
         //(Request 7)
-     //   [Authorize]
+        [Authorize]
         [HttpPost]
         [Route("Create_ActivityAvailabilty")]  //Eman
         public IActionResult Create_ActivityAvailabilty([FromBody]BookingSettingModel bookingSettingModel, int activityId, int mode)
@@ -1236,7 +1238,7 @@ namespace Core.Api.Controllers
 
         
         //*********************************************
-        //[Authorize]
+        //
         //[HttpPost]
         //[Route("BookingSetting")]
         //public IActionResult BookingSetting([FromBody]BookingSettingModel bookingSettingModel)

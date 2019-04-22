@@ -13,7 +13,7 @@ namespace Core.Api.Controllers
         AppDbContext db = new AppDbContext();
 
         [HttpGet]
-        [Authorize]
+        
         [Route("GetLookUp")]
         public IActionResult GetLookUp(string lookUp)  //***
         {

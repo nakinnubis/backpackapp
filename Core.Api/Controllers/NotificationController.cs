@@ -8,11 +8,14 @@ using System.IO;
 using System.Net;
 using System.Text;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.Cors;
 
 namespace Core.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors("AllowOrigin")]
+    [Authorize]
     public class NotificationController : BaseController
     {
         AppDbContext db = new AppDbContext();
@@ -21,7 +24,7 @@ namespace Core.Api.Controllers
 
 
         [HttpPost, Route("AddDevice")]
-        [Authorize]
+        
         public IActionResult AddDevice([FromBody] UserDevice userDevice)
         {
             var userId= GetUserId();
@@ -51,7 +54,7 @@ namespace Core.Api.Controllers
         }
 
 
-        //[Authorize]
+        //
         //[HttpPost, Route("SendAndroidNotification")]
         //public IActionResult SendIOSNotification(string pushKey, string message, object data)
         //{
@@ -97,7 +100,7 @@ namespace Core.Api.Controllers
         //    }
         //}
 
-        [Authorize]
+        
         [HttpPost, Route("SendAndroidNotification")]
         public IActionResult SendAndroidNotification([FromBody]PushObject pushObject)
         {

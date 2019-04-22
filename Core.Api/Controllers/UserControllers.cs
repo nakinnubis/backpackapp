@@ -9,19 +9,22 @@ using Core.Api.Models;
 using Core.Api.Helper;
 using Core.Web.Models;
 using System.Drawing;
+using Microsoft.AspNetCore.Cors;
 
 namespace Core.Api.Controllers
 {
     [Produces("application/json")]
     [Route("api/User")]
     [ApiController]
+    [EnableCors("AllowOrigin")]
+    [Authorize]
     public class UserController : BaseController
     {
 
         AppDbContext db = new AppDbContext();
 
         [HttpPost]
-        [Authorize]
+        
         [Route("createOrganizer")]
         public IActionResult createOrganizer([FromBody]Activity_Organizer organizer)
         {
@@ -36,7 +39,7 @@ namespace Core.Api.Controllers
 
 
         [HttpGet]
-        [Authorize]
+        
         [Route("GetOrganizers")]
         public IActionResult GetOrganizers()  //***
         {
@@ -58,7 +61,7 @@ namespace Core.Api.Controllers
 
 
         [HttpGet]
-        [Authorize]
+        
         [Route("GetOrganizerTypes")]
         public IActionResult GetOrganizerTypes()  //***
         {
@@ -71,7 +74,7 @@ namespace Core.Api.Controllers
 
 
         [HttpPost]
-        [Authorize]
+        
         [Route("ForgetPassword")]
         public IActionResult ForgetPassword([FromBody]string email)
         {
@@ -85,7 +88,7 @@ namespace Core.Api.Controllers
     
         }
 
-        [Authorize]
+        
         [Route("ShowStatistics")]
         public IActionResult ShowStatistics(string providerId)
         {
@@ -116,7 +119,7 @@ namespace Core.Api.Controllers
         }
 
 
-        [Authorize]
+        
         [Route("GetProfile")]
         public IActionResult GetProfile()  //*
 
@@ -153,7 +156,7 @@ namespace Core.Api.Controllers
             }
         }
         [HttpGet]
-        [Authorize]
+        
         [Route("Inbox")]
         public IActionResult Inbox()  //***
         {
@@ -178,7 +181,7 @@ namespace Core.Api.Controllers
         }
 
         [HttpGet]
-        [Authorize]
+        
         [Route("CustomerInbox")]
         public IActionResult CustomerInbox()  //***
         {
@@ -227,7 +230,7 @@ namespace Core.Api.Controllers
 
         }
         [HttpGet]
-        [Authorize]
+        
         [Route("Cust_Chat")]
         public IActionResult Cust_Chat(int ticketId,int chatId)  //***
         {
@@ -254,7 +257,7 @@ namespace Core.Api.Controllers
         }
       
         [HttpGet]
-        [Authorize]
+        
         [Route("User_Chat")]
         public IActionResult User_Chat(int chatId)  //***
         {
@@ -287,7 +290,7 @@ namespace Core.Api.Controllers
 
      
         [HttpPost]
-        [Authorize]
+        
         [Route("send_message")]
         public IActionResult send_message([FromBody]MessageReply messageReply,int chatId, int availabilityId)  //***
         {
@@ -361,7 +364,7 @@ namespace Core.Api.Controllers
 
 
         //delete photo of user from (website not app) 
-        [Authorize]
+        
         [Route("DeleteUserPhotoOnServer")]
         public IActionResult DeleteUserPhotoOnServer(int userId)
         {
@@ -389,7 +392,7 @@ namespace Core.Api.Controllers
 
 
         //Save user photo on server (website) 
-        [Authorize]
+        
         [HttpPost]
         [Route("Create_URLOfUserPhoto")]
         public IActionResult Create_URLOfUserPhoto([FromBody]string Photo, string userId)

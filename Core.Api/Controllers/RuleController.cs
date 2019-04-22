@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Core.Web.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Core.Api.Controllers
@@ -9,12 +10,14 @@ namespace Core.Api.Controllers
     [Produces("application/json")]
     [Route("api/Rule")]
     [ApiController]
+    [EnableCors("AllowOrigin")]
+    [Authorize]
     public class RuleController : ControllerBase
     {
         AppDbContext db = new AppDbContext();
 
         [HttpPost]
-        [Authorize]
+        
         [Route("CreateRule")]
         public IActionResult CreateRule([FromBody] Rule rule)
         {
@@ -34,7 +37,7 @@ namespace Core.Api.Controllers
             return BadRequest(new { message = "Please,Check Data" });
         }
 
-        [Authorize]
+        
         [Route("GetAllRules")]
         public IActionResult GetAllRules()  //***
         {
@@ -52,7 +55,7 @@ namespace Core.Api.Controllers
 
 
         [Route("DeleteRule")]
-        [Authorize]
+        
         public IActionResult DeleteRule(int id)
         {
             var Rule = db.Rule.Find(id);

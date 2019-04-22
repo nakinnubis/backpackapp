@@ -40,7 +40,10 @@ namespace Core.Web
                     Configuration.GetConnectionString("DefaultConnection")));
             services.AddDefaultIdentity<IdentityUser>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
-
+            services.AddCors(c =>
+            {
+                c.AddPolicy("AllowOrigin", options => options.AllowAnyOrigin());
+            });
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 
@@ -63,7 +66,7 @@ namespace Core.Web
             app.UseCookiePolicy();
 
             app.UseAuthentication();
-
+            app.UseCors(options => options.AllowAnyOrigin());
             app.UseMvc(routes =>
             {
                 routes.MapRoute(

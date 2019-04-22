@@ -2,6 +2,7 @@
 using System.Linq;
 using Core.Web.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Core.Api.Controllers
@@ -10,11 +11,13 @@ namespace Core.Api.Controllers
     [Produces("application/json")]
     [Route("api/Reviews")]
     [ApiController]
+    [EnableCors("AllowOrigin")]
+    [Authorize]
     public class ReviewsController : ControllerBase
     {
         AppDbContext db = new AppDbContext();
 
-        [Authorize]
+        
         [Route("ActivityReview")]
         public IActionResult ActivityReview(int activityid, Reviews userReview)
         {
@@ -48,7 +51,7 @@ namespace Core.Api.Controllers
 
         }
 
-        [Authorize]
+        
         [Route("ReportReview")]
         public IActionResult ReportReview(int reviewid)
         {
@@ -73,7 +76,7 @@ namespace Core.Api.Controllers
             return Ok(new { reviewId=review.reviewid });
         }
 
-        [Authorize]
+        
         [HttpPost]
         [Route("ReviewReplies")]
         public IActionResult ReviewReplies([FromBody]string reply, int reviewid)
