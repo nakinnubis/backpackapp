@@ -606,36 +606,36 @@ namespace Core.Api.Controllers
             if (activity == null)
                 return BadRequest();
 
-            var reservations = from a in db.Avaliability.Include(x => x.Avaliability_Pricings)
-                               where a.activity_id == activityid
-                               select new reservation
-                               {
-                                   totalCapacity = a.Activity.totalCapacity,
-                                   // Activity_group_price = a.Activity.group_price,
-                                   activity_Start = a.activity_Start,
-                                   activity_End = a.activity_End,
-                                   avaliabilityid = a.id,
-                                   Availability_group_Price = a.group_Price,
-                                   isForGroup = a.isForGroup,
-                                   total_tickets = a.total_tickets,
-                                   Avaliabilities = a.Activity.Avaliabilities,
-                                   BookinfInfo = a.Activity.Bookings,
-                                   //individualCategories=a.Activity.Individual_Categories.Select(s=> new IndividualCategoryModel {
-                                   //    id=s.id,
-                                   //    name=s.name,
-                                   //    capacity=s.capacity,
-                                   //    price=s.price,
-                                   //    price_after_discount=s.price_after_discount,
-                                   //    activity_Id = s.activityid
-                                   //}),
-                                   avaliabilityPricing = a.Avaliability_Pricings.Select(s => new AvaliabilityPricing
-                                   {
-                                       id = s.id,
-                                       individualCategoryId = s.individualCategoryId,
-                                       price = s.price,
-                                       priceAfterDiscount = s.priceAfterDiscount
-                                   })
-                               };
+            var reservations = db.Avaliability.Include(x => x.Avaliability_Pricings).Where(a => a.activity_id == activityid).Select(c => new reservation
+            {
+                totalCapacity = c.Activity.totalCapacity,
+                // Activity_group_price = a.Activity.group_price,
+                activity_Start = c.activity_Start,
+                activity_End = c.activity_End,
+                avaliabilityid = c.id,
+                Availability_group_Price = c.group_Price,
+                isForGroup = c.isForGroup,
+                total_tickets = c.total_tickets,
+                 BookinfInfo = c.Activity.Bookings.Select(g=>g).AsEnumerable(),
+                //individualCategories=a.Activity.Individual_Categories.Select(s=> new IndividualCategoryModel {
+                //    id=s.id,
+                //    name=s.name,
+                //    capacity=s.capacity,
+                //    price=s.price,
+                //    price_after_discount=s.price_after_discount,
+                //    activity_Id = s.activityid
+                //}),
+                avaliabilityPricing = c.Avaliability_Pricings.Select(f=> new AvaliabilityPricing {
+                    id =f.id,
+                individualCategoryId= f.individualCategoryId,
+                price= f.price,
+                priceAfterDiscount= f.priceAfterDiscount
+                }).AsEnumerable()
+
+            }).ToList();
+                //from a in db.Avaliability.Include(x => x.Avaliability_Pricings)
+                //               where a.activity_id == activityid
+                //               select ;
 
             return Ok(reservations);
 

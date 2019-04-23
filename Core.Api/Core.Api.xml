@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Core.Api</name>
+    </assembly>
+    <members>
+        <member name="M:Core.Api.Controllers.ActivityController.GetOptions">
+            <summary>
+            To get all option (id,name,online url of icon and age if option=Child)
+            such as (Family ,Male ,Female)
+            fromAge and ToAge  save in activityOption
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Core.Api.Controllers.ActivityController.UpcomingActivity">
+            <summary>
+            To get all Upcoming Activity related to current user which not deleted and completed .
+            </summary>
+            <returns></returns>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:Core.Api.Controllers.ActivityController.GetAllActivities" -->
+        <member name="M:Core.Api.Controllers.ActivityController.GetActivityReview(System.Int32)">
+            <summary>
+             get all reviews which not blocked  of certain activity 
+            </summary>
+            <param name="activityid"></param>
+            <returns> online activity url  </returns>
+        </member>
+        <member name="M:Core.Api.Controllers.ActivityController.GetActivityDetails(System.Int32)">
+            <summary>
+            get activity data from (Activity,ActivityType,Activity_Photos,Activity_Add_Ons, Activity_Rules,
+                                    Avaliabilities,Individual_Categories,Activity_Organizer,Activity_Option)
+            </summary>
+            <param name="activityid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Core.Api.Controllers.ActivityController.CalenarAvailablility(Core.Api.Models.BookingSettingModel,System.Int32)">
+            <summary>
+            
+            </summary>
+            <param name="bookingSettingModel"></param>
+            <param name="activityId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Core.Api.Controllers.ActivityController.DeleteAvailablility(System.Int32)">
+            <summary>
+            delete availablility and check if there booking of this avalibility 
+            </summary>
+            <param name="availablilityId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Core.Api.Controllers.ActivityController.Avaliability_Pricing(Core.Api.Models.AvalibilityPricingModel,System.Int32,System.Int32)">
+            <summary>
+            To create and edit Avaliability_Pricing from activity according to mode and avaliabilityid
+            mode=0 (Add)  , mode=1 (Edit)
+            
+            </summary>
+            <param name="avalibilityPricingModel"></param>
+            <param name="avaliabilityid"></param>
+            <param name="mode"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Core.Api.Helper.GetUserImage">
+            <summary>
+            Object in this class manages user image and path.
+            </summary>
+        </member>
+        <member name="P:Core.Api.Helper.GetUserImage.ImagePathForUserPhoto">
+            <summary>
+            Returns user image path.
+            </summary>
+        </member>
+    </members>
+</doc>

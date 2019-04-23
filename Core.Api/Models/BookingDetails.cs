@@ -156,7 +156,7 @@ namespace Core.Api.Models
         public IEnumerable<Booking> BookinfInfo { get; set; }
         //public IEnumerable<Booking_Ticket> BookingTickets { get; set; }
         //  public decimal Activity_group_price { get; set; }
-        public IEnumerable<Avaliability> Avaliabilities{get;set; }
+        //public IEnumerable<Avaliability> avaliabilities{get;set; }
         // return 1 in case of group, 0 for individual
         public Nullable<int> isForGroup { get; set; }
         public Nullable<int> total_tickets { get; set; }
