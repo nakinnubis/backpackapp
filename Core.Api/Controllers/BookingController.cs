@@ -447,7 +447,7 @@ namespace Core.Api.Controllers
 
         [HttpGet]
         [Route("GetBookingDetails")]
-        [Authorize]
+    //    [Authorize]
         public IActionResult GetBookingDetails(int Bookingid, long ticketNo)
         {
             int? bookingid;
@@ -618,6 +618,8 @@ namespace Core.Api.Controllers
                                    Availability_group_Price = a.group_Price,
                                    isForGroup = a.isForGroup,
                                    total_tickets = a.total_tickets,
+                                   Avaliabilities = a.Activity.Avaliabilities,
+                                   BookinfInfo = a.Activity.Bookings,
                                    //individualCategories=a.Activity.Individual_Categories.Select(s=> new IndividualCategoryModel {
                                    //    id=s.id,
                                    //    name=s.name,
@@ -641,34 +643,41 @@ namespace Core.Api.Controllers
         }
 
         #region g
-        ////[HttpPut("{id}")]
-        ////[Route("EditBooking")]
-        ////public IActionResult EditBooking(int id, [FromBody] Booking model)
-        ////{
-        ////    var booking = db.Booking.Find(id);
-        ////    if (booking != null)
-        ////    {
-        ////        booking.id = id;
-        ////        db.Entry(booking).State = EntityState.Modified;
-        ////        db.SaveChanges();
-        ////        return Ok(new { message = "Booking edit successfully" });
-        ////    }
-        ////    return NotFound();
-        ////}
+        [HttpPut("{id}")]
+        [Route("EditBooking")]
+        public IActionResult EditBooking(int id, [FromBody] Booking model)
+        {
+            var booking = db.Booking.Find(id);
+            if (booking != null)
+            {
+                booking.id = id;
+                db.Entry(booking).State = EntityState.Modified;
+                db.SaveChanges();
+                return Ok(new { message = "Booking edit successfully" });
+            }
+            return NotFound();
+        }
 
-        ////[HttpDelete("{id}")]
-        ////[Route("DeleteBooking")]
-        ////public IActionResult Delete(int id)
-        ////{
-        ////    var booking = db.Booking.Find(id);
-        ////    if (booking == null)
-        ////    {
-        ////        return NotFound();
-        ////    }
-        ////    db.Booking.Remove(booking);
-        ////    db.SaveChanges();
-        ////    return NoContent();
-        ////}
+        [HttpDelete("{id}")]
+        [Route("DeleteBooking")]
+        public IActionResult Delete(int id)
+        {
+            var booking = db.Booking.Find(id);
+            if (booking == null)
+            {
+                return NotFound();
+            }
+            db.Booking.Remove(booking);
+            db.SaveChanges();
+            return NoContent();
+        }
+
+        [Route("GetBookingByActivity")]
+        public IActionResult GetBookingByActivity(DateTime date)
+        {
+            return Ok();
+        }
+        
 
         #endregion
     }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Core.Web.Models;
+using System;
 using System.Collections.Generic;
 
 namespace Core.Api.Models
@@ -150,10 +151,12 @@ namespace Core.Api.Models
         //  public bool full_group { get; set; }
 
         public int? avaliabilityid { get; set; }
-        public Nullable<System.DateTime> activity_Start { get; set; }
-        public Nullable<System.DateTime> activity_End { get; set; }
-      //  public decimal Activity_group_price { get; set; }
-
+        public DateTime? activity_Start { get; set; }
+        public DateTime? activity_End { get; set; }
+        public IEnumerable<Booking> BookinfInfo { get; set; }
+        //public IEnumerable<Booking_Ticket> BookingTickets { get; set; }
+        //  public decimal Activity_group_price { get; set; }
+        public IEnumerable<Avaliability> Avaliabilities{get;set; }
         // return 1 in case of group, 0 for individual
         public Nullable<int> isForGroup { get; set; }
         public Nullable<int> total_tickets { get; set; }

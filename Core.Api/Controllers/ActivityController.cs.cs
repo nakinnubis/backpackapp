@@ -172,6 +172,42 @@ namespace Core.Api.Controllers
                 return NoContent();
         }
 
+        [Authorize]
+        [HttpGet]
+       [ Route("GetActivityByDate")]
+        public IActionResult GetActivityByDate(DateTime date)
+        {
+            var activity = db.Activity.Where(c=>c.Avaliabilities.Where(f=>f.activity_Start.Value.Date==date.Date) !=null).Select(x => new
+            {
+                x.id,
+                x.title,
+                x.activity_Location,
+                x.status,
+                x.stepNumber,
+                x.isCompleted,
+                x.rate,
+                Category = new ActivityTypemodel
+                {
+                    Id = x.ActivityType.id,
+                    Name = x.ActivityType.Name,
+                    url = GetUserImage.OnlineImagePathForActivityTypePhoto + x.ActivityType.url
+                },
+                x.Avaliabilities,
+                x.Bookings,
+                x.bookingAvailableForGroups,
+                x.bookingAvailableForIndividuals,
+                Activity_Photos = x.Activity_Photos.Select(s => new photomodel
+                {
+                    id = s.id,
+                    url = GetUserImage.OnlineImagePathForActivity + s.url,
+                    cover_photo = s.cover_photo
+                }).ToList(),
+            }).ToList();
+            if (activity != null){
+                return Ok(activity);
+            }
+            return BadRequest( new { message="Request returned empty data"});
+        }
         /// <summary>
         ///  get all reviews which not blocked  of certain activity 
         /// </summary>
