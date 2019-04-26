@@ -172,37 +172,50 @@ namespace Core.Api.Controllers
                 return NoContent();
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpGet]
        [ Route("GetActivityByDate")]
         public IActionResult GetActivityByDate(DateTime date)
         {
-            var activity = db.Activity.Where(c=>c.Avaliabilities.Where(f=>f.activity_Start.Value.Date==date.Date) !=null).Select(x => new
+            var activity = db.Avaliability.Include(x=>x.Avaliability_Pricings).Where(f => f.activity_Start.Value.Date == date.Date).Select(x => new
             {
-                x.id,
-                x.title,
-                x.activity_Location,
-                x.status,
-                x.stepNumber,
-                x.isCompleted,
-                x.rate,
+                avaliabilityid = x.id,
+                x.Activity.title,
+                x.Activity.activity_Location,
+                x.Activity.status,
+                x.Activity.stepNumber,
+                x.Activity.isCompleted,
+                x.Activity.rate,
+                x.Activity.totalCapacity,
+                x.activity_Start,
+               x.activity_End,
+                Availability_group_Price = x.group_Price,
+               x.isForGroup,
+             x.total_tickets,
+                avaliabilityPricing = x.Avaliability_Pricings.Select(f => new AvaliabilityPricing
+                {
+                    id = f.id,
+                    individualCategoryId = f.individualCategoryId,
+                    price = f.price,
+                    priceAfterDiscount = f.priceAfterDiscount
+                }).AsEnumerable(),
                 Category = new ActivityTypemodel
                 {
-                    Id = x.ActivityType.id,
-                    Name = x.ActivityType.Name,
-                    url = GetUserImage.OnlineImagePathForActivityTypePhoto + x.ActivityType.url
+                    Id = x.Activity.ActivityType.id,
+                    Name = x.Activity.ActivityType.Name,
+                    url = GetUserImage.OnlineImagePathForActivityTypePhoto + x.Activity.ActivityType.url
                 },
-                x.Avaliabilities,
-                x.Bookings,
-                x.bookingAvailableForGroups,
-                x.bookingAvailableForIndividuals,
-                Activity_Photos = x.Activity_Photos.Select(s => new photomodel
+                //x.Activity.Avaliabilities,
+               BookingInfo=x.Activity.Bookings.Where(d=>d.bookingDate!=null).AsEnumerable(),
+                x.Activity.bookingAvailableForGroups,
+                x.Activity.bookingAvailableForIndividuals,
+                Activity_Photos = x.Activity.Activity_Photos.Select(s => new photomodel
                 {
                     id = s.id,
                     url = GetUserImage.OnlineImagePathForActivity + s.url,
                     cover_photo = s.cover_photo
                 }).ToList(),
-            }).ToList();
+            }).ToList();          
             if (activity != null){
                 return Ok(activity);
             }
@@ -405,8 +418,8 @@ namespace Core.Api.Controllers
                     return BadRequest(new { message = "Please, Check activity id" });
 
                 var reservation = db.Booking.Where(x => x.avaliability_id == availbility.id).Select(x=>x.id).ToList();
-                if (reservation.Count != 0)
-                    return Ok("Can't edit this availability");
+                //if (reservation.Count != 0)
+                //    return Ok("Can't edit this availability");
                 //Edit
                 availbility.activity_Start = bookingSettingModel.avalibilityModel.activity_Start;
                 availbility.activity_End = bookingSettingModel.avalibilityModel.activity_End;

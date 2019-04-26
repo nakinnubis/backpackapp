@@ -38,7 +38,7 @@ namespace Core.Api.Models
         public string enddate { get; set; }
         public string starthour { get; set; }
         public string endhour { get; set; }
-        public bool reoccuring { get; set; }
+        public bool? reoccuring { get; set; }
         // return 1 in case of group, 0 for individual
         public int? isForGroup { get; set; }
         public decimal? group_Price { get; set; }

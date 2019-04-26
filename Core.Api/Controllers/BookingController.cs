@@ -616,7 +616,7 @@ namespace Core.Api.Controllers
                 Availability_group_Price = c.group_Price,
                 isForGroup = c.isForGroup,
                 total_tickets = c.total_tickets,
-                 BookinfInfo = c.Activity.Bookings.Select(g=>g).AsEnumerable(),
+                 BookinfInfo = c.Activity.Bookings.Where(g => g.activity_id == activityid).AsEnumerable(),
                 //individualCategories=a.Activity.Individual_Categories.Select(s=> new IndividualCategoryModel {
                 //    id=s.id,
                 //    name=s.name,
@@ -672,12 +672,56 @@ namespace Core.Api.Controllers
             return NoContent();
         }
 
-        [Route("GetBookingByActivity")]
-        public IActionResult GetBookingByActivity(DateTime date)
+        [HttpGet]
+        [Route("GetActivityByDate")]
+        public IActionResult GetActivityByDate(DateTime date)
         {
-            return Ok();
+            var activity = db.Avaliability.Include(x => x.Avaliability_Pricings).Where(f => f.activity_Start.Value.Date == date.Date).Select(x => new
+            {
+                avaliabilityid = x.id,
+                x.Activity.title,
+                x.Activity.activity_Location,
+                x.Activity.status,
+                x.Activity.stepNumber,
+                x.Activity.isCompleted,
+                x.Activity.rate,
+                x.Activity.totalCapacity,
+                x.activity_Start,
+                x.activity_End,
+                Availability_group_Price = x.group_Price,
+                x.isForGroup,
+                x.total_tickets,
+                avaliabilityPricing = x.Avaliability_Pricings.Select(f => new AvaliabilityPricing
+                {
+                    id = f.id,
+                    individualCategoryId = f.individualCategoryId,
+                    price = f.price,
+                    priceAfterDiscount = f.priceAfterDiscount
+                }).AsEnumerable(),
+                Category = new ActivityTypemodel
+                {
+                    Id = x.Activity.ActivityType.id,
+                    Name = x.Activity.ActivityType.Name,
+                    url = GetUserImage.OnlineImagePathForActivityTypePhoto + x.Activity.ActivityType.url
+                },
+                //x.Activity.Avaliabilities,
+                BookingInfo = x.Activity.Bookings.Where(d => d.bookingDate != null).AsEnumerable(),
+                x.Activity.bookingAvailableForGroups,
+                x.Activity.bookingAvailableForIndividuals,
+                Activity_Photos = x.Activity.Activity_Photos.Select(s => new photomodel
+                {
+                    id = s.id,
+                    url = GetUserImage.OnlineImagePathForActivity + s.url,
+                    cover_photo = s.cover_photo
+                }).ToList(),
+            }).ToList();
+            if (activity != null)
+            {
+                return Ok(activity);
+            }
+            return BadRequest(new { message = "Request returned empty data" });
         }
-        
+
 
         #endregion
     }
