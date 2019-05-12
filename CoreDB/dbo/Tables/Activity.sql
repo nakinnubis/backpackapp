@@ -30,11 +30,16 @@
     [isdeleted]                      BIT             DEFAULT ((0)) NOT NULL,
     [capacityIsUnlimited]            BIT             DEFAULT ((0)) NOT NULL,
     [price_discount]                 REAL            NOT NULL,
+    [has_specific_capacity] BIT NULL DEFAULT ((0)), 
+    [has_individual_categories] BIT NULL DEFAULT ((0)), 
+    [individual_categories] NVARCHAR(MAX) NULL, 
+    [modified_date] DATE NULL, 
     CONSTRAINT [PK_Activity] PRIMARY KEY CLUSTERED ([id] ASC),
     CONSTRAINT [FK_Activity_ActivityType_type_id] FOREIGN KEY ([type_id]) REFERENCES [dbo].[ActivityType] ([id]) ON DELETE SET NULL ON UPDATE SET NULL,
-    CONSTRAINT [FK_Activity_User_user_id] FOREIGN KEY ([user_id]) REFERENCES [dbo].[User] ([id])
-);
+    CONSTRAINT [FK_Activity_User_user_id] FOREIGN KEY ([user_id]) REFERENCES [dbo].[User] ([id])	 
 
+);
+ 
 
 GO
 CREATE NONCLUSTERED INDEX [IX_Activity_user_id]

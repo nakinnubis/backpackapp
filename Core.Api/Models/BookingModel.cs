@@ -15,6 +15,7 @@ namespace Core.Api.Models
         public Nullable<decimal> booking_amount { get; set; }
         public IEnumerable<BookingTicket> bookingTicket { get; set; }
         public  IEnumerable<Booking_individual_category_capacity> bookingIndividualCategoryCapacity { get; set; }
+        public string time_option { get; set; }
 
     }
 

@@ -9,6 +9,7 @@
     [payment_method]  INT             NOT NULL,
     [user_id]         INT             NULL,
     [customer_id]     INT             NULL,
+    [time_option] NVARCHAR(MAX) NULL, 
     CONSTRAINT [PK_Booking] PRIMARY KEY CLUSTERED ([id] ASC),
     CONSTRAINT [FK_Booking_Activity_activity_id] FOREIGN KEY ([activity_id]) REFERENCES [dbo].[Activity] ([id]),
     CONSTRAINT [FK_Booking_Avaliability_avaliability_id] FOREIGN KEY ([avaliability_id]) REFERENCES [dbo].[Avaliability] ([id]),

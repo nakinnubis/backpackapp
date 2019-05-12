@@ -50,7 +50,8 @@ namespace Core.Web.Models
         public bool isregistered { get; set; }
         public bool isverified { get; set; }
         public int preferablePrice { get; set; }
-        
+        public string email { get; set; }
+        public string registrationType { get; set; }
         public virtual Banks Banks { get; set; }
 
         public virtual ICollection<Notifications> Notifications { get; set; }

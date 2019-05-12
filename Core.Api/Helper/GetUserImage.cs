@@ -43,7 +43,8 @@ namespace Core.Api.Helper
         {
             get
             {
-                return "http://backpackapis.wasltec.org/" + ImagePathForUserPhoto;// +"/";
+                //change to current hosted url
+                return "http://petroquestdata.com/" + ImagePathForUserPhoto;// +"/";
             }
         }
 
@@ -51,15 +52,15 @@ namespace Core.Api.Helper
         {
             get
             {
-                // return Startup._hostingEnvironment.ContentRootPath + ImagePathForActivityTypePhoto;// +"/";
-                return "http://backpackapis.wasltec.org/" + ImagePathForActivityTypePhoto;// +"/";
+                //return Startup._hostingEnvironment.ContentRootPath + ImagePathForActivityTypePhoto;// +"/";
+                return "http://petroquestdata.com/" + ImagePathForActivityTypePhoto;// +"/";
             }
         }
         public static string OnlineImagePathForActivity
         {
             get
             {
-                return "http://backpackapis.wasltec.org/" + ImagePathForActivity;// +"/";
+                return "http://petroquestdata.com/" + ImagePathForActivity;// +"/";
             }
         }
 

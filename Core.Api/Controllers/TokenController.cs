@@ -88,6 +88,7 @@ namespace Core.Api.Controllers
                     mail = user.mail,
                     isProvider = user.isProvider,
                     mobile = user.mobile,
+                    registrationType=user.registrationType,
                     preferablePrice = user.preferablePrice,
                     UserPhoto_Url = Path.Combine(GetUserImage.OnlineImagePathForUserPhoto + user.UserPhoto_Url)
                 };
@@ -120,6 +121,7 @@ namespace Core.Api.Controllers
             public bool isProvider { get; set; }
             public string UserPhoto_Url { get; set; }
             public int preferablePrice { get; set; }
+            public string registrationType { get; set; }
 
         }
 

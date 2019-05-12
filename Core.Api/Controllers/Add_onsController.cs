@@ -39,17 +39,38 @@ namespace Core.Api.Controllers
         [Route("GetAllAdd_Ons")]
         public IActionResult GetAllAdd_Ons()
         {
-            int userid = int.Parse(HttpContext.User.FindFirst("userId").Value);
+            int userid = int.Parse(this.HttpContext.User.FindFirst("userId").Value);
+            var list1 = this.db.Add_Ons.Where(c => c.add_by.Value == userid && c.isdeleted == (bool?)false).Select(x => new
+            {
+                id = x.id,
+                name = x.name,
+                icon = x.icon,
+                definedby = string.Format("{0}", (object)userid),
+                intial = true
+            }).ToList();
+            var list2 = this.db.Add_Ons.Where(x => (x.add_by == (int?)userid | x.add_by == new int?()) & x.isdeleted == (bool?)false).Select(x => new
+            {
+                id = x.id,
+                name = x.name,
+                icon = x.icon,
+                definedby = "others",
+                intial = x.add_by == new int?() ? true : false
+            }).ToList();
+            list1.Concat(list2);
+            if (list2 != null)
+                return Ok(list2);
+            return NoContent();
+            //int userid = int.Parse(HttpContext.User.FindFirst("userId").Value);
 
-            var Add_Ons = db.Add_Ons.Where(x=>(x.add_by==userid|x.add_by==null)&x.isdeleted==false).Select(x => new
-                          { x.id,
-                            x.name,
-                            x.icon,
-                            intial =x.add_by==null?true:false}).ToList();
-            if (Add_Ons != null)
-                return Ok(Add_Ons);
-            else
-                return NoContent();
+            //var Add_Ons = db.Add_Ons.Where(x=>(x.add_by==userid|x.add_by==null)&x.isdeleted==false).Select(x => new
+            //              { x.id,
+            //                x.name,
+            //                x.icon,
+            //                intial =x.add_by==null?true:false}).ToList();
+            //if (Add_Ons != null)
+            //    return Ok(Add_Ons);
+            //else
+            //    return NoContent();
         }
 
 

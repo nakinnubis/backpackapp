@@ -42,7 +42,6 @@ namespace Core.Web.Models
         public virtual PaymentMethods PaymentMethods { get; set; }
         public virtual ICollection<Booking_individual_category_capacity> Booking_individual_category_capacity { get; set; }
         public virtual ICollection<Booking_Ticket> Booking_Tickets { get; set; }
-
-       
+        public string time_option { get; set; }
     }
 }

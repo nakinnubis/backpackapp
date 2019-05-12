@@ -7,6 +7,7 @@
     [total_tickets]  INT             NULL,
     [group_Price]    DECIMAL (18, 2) NULL,
     [reoccuring] BIT NULL, 
+    [isForIndividual] INT NULL, 
     CONSTRAINT [PK_Avaliability] PRIMARY KEY CLUSTERED ([id] ASC),
     CONSTRAINT [FK_Avaliability_Activity_activity_id] FOREIGN KEY ([activity_id]) REFERENCES [dbo].[Activity] ([id])
 );

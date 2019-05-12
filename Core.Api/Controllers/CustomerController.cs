@@ -126,7 +126,8 @@ namespace Core.Api.Controllers
                  // var idd = int.Parse(customer.);
                 //string id, string user_name
                 var idd = GetUserId();
-                var regcustomer = db.User.Find(customer.id);
+                //var testid = 7;
+                var regcustomer = db.User.Find(idd);
                 if (regcustomer == null)
                     return Ok(new { status = 0, message = "Customer doesn't exist" });
 
@@ -156,14 +157,14 @@ namespace Core.Api.Controllers
                     {
                         regcustomer.UserPhoto_Url = string.Concat(regcustomer.id.ToString(), "", ".png");
                         string FilePath = string.Concat(GetUserImage.ImagePathForUserPhoto, regcustomer.id.ToString(), ".png");
-
-                        using (MemoryStream ms = new MemoryStream(Convert.FromBase64String(customer.customerphoto64)))
-                        {
-                            using (Bitmap bm2 = new Bitmap(ms))
-                            {
-                                bm2.Save(FilePath);
-                            }
-                        }
+                        ImageSaveHelper.SaveImageToPath(customer.customerphoto64, regcustomer, "UserImages");
+                        //using (MemoryStream ms = new MemoryStream(Convert.FromBase64String(customer.customerphoto64)))
+                        //{
+                        //    using (Bitmap bm2 = new Bitmap(ms))
+                        //    {
+                        //        bm2.Save(FilePath);
+                        //    }
+                        //}
                     }
 
 

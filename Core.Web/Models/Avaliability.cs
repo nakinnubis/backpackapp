@@ -21,6 +21,7 @@ namespace Core.Web.Models
         public bool? reoccuring { get; set; }
         // return 1 in case of group, 0 for individual
         public Nullable<int> isForGroup { get; set; }
+        public Nullable<int> isForIndividual { get; set; }
         public Nullable<decimal> group_Price { get; set; }
         public Nullable<int> total_tickets { get; set; }
 

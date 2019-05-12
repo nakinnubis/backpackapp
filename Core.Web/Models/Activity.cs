@@ -28,6 +28,8 @@ namespace Core.Web.Models
         [ForeignKey("ActivityType")]
         public Nullable<int> type_id { get; set; }
         public string title { get; set; }
+        public bool? has_individual_categories { get; set; }
+        public bool? has_specific_capacity { get; set; }
         public string description { get; set; }
         public string activity_Location { get; set; }
         public string meeting_Location { get; set; }
@@ -86,10 +88,14 @@ namespace Core.Web.Models
         public virtual ICollection<Activity_Rule> Activity_Rules { get; set; }
       
         public virtual ICollection<IndividualCategory> Individual_Categories { get; set; }
+        public string individual_categories { get; set; }
+        public DateTime? modified_date { get; set; }
 
-    
 
-        
+
+
+
+
     }
 }
 

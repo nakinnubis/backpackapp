@@ -12,6 +12,7 @@ using Core.Web.Models;
 using Core.Api.Models;
 using Core.Api.Helper;
 using Microsoft.AspNetCore.Cors;
+using System.Threading.Tasks;
 
 namespace Core.Api.Controllers
 {
@@ -102,38 +103,6 @@ namespace Core.Api.Controllers
         [Authorize]
         public IActionResult GetAllActivities()  //offline&online&incomplete 
         {
-            #region comment
-            //var activities =
-            //    db.Activity.Include(x => x.ActivityType).Include(x => x.Activity_Photos)
-            //           .Where(x => x.isdeleted == false && x.user_id == GetUserId()).ToList()
-            //                 .Select(x => new
-            //                 {
-            //                     x.id,
-            //                     x.title,
-            //                     x.activity_Location,
-            //                     x.status,
-            //                     x.stepNumber,
-            //                     x.isCompleted,
-            //                     x.rate,
-            //                     Category = new ActivityTypemodel
-            //                     {
-            //                         Id = x.ActivityType.id,
-            //                         Name = x.ActivityType.Name,
-            //                         url = GetUserImage.OnlineImagePathForActivityTypePhoto + x.ActivityType.url
-            //                     },
-            //                     Activity_Photos = x.Activity_Photos.Select(s => new photomodel
-            //                     {
-            //                         id = s.id,
-            //                         url = GetUserImage.OnlineImagePathForActivity + s.url,
-            //                         cover_photo = s.cover_photo
-            //                     }).ToList(),
-            //                     groupbystatus = (x.status == true & x.isCompleted == true) ? "online" : (x.status == false & x.isCompleted == true) ? "offline" : "incomplete"
-
-            //                 }).ToList().GroupBy(x => x.groupbystatus).Select(y => new {
-            //                     key = y.Key,
-            //                     lst = y
-            //                 });
-            #endregion
             var activities =
               db.Activity.Include(x => x.ActivityType).Include(x => x.Activity_Photos)
                      .Where(x => x.isdeleted == false && x.user_id == GetUserId()).ToList()
@@ -163,9 +132,6 @@ namespace Core.Api.Controllers
             var OfflineActivities =activities.Where(x=>x.status==false & x.isCompleted == true).ToList();
             var OnlinneActivites= activities.Where(x => x.status == true & x.isCompleted == true).ToList();
             var IncompleteActivites= activities.Where(x =>  x.isCompleted == false).ToList();
-             
-
-
             if (activities != null)
             return Ok( new { OnlinneActivites,OfflineActivities, IncompleteActivites } );
             else
@@ -279,6 +245,8 @@ namespace Core.Api.Controllers
                                meeting_Lat = a.meeting_Lat,
                                isCompleted = a.isCompleted,
                                stepNumber = a.stepNumber,
+                               has_individual_categories=a.has_individual_categories,
+                               has_specific_capacity=a.has_specific_capacity,
                                capacityIsUnlimited = a.capacityIsUnlimited,
                                Category = new ActivityTypemodel
                                {
@@ -425,7 +393,6 @@ namespace Core.Api.Controllers
                 availbility.activity_End = bookingSettingModel.avalibilityModel.activity_End;
                 availbility.group_Price = bookingSettingModel.avalibilityModel.group_Price;
                 //  availbility.Activity.apply_discount = bookingSettingModel.apply_discount;
-
                 db.SaveChanges();
               
             }
@@ -477,6 +444,29 @@ namespace Core.Api.Controllers
             return Ok(new { status = 1, message = "deleted successfully" });
 
         }
+        /// <summary>
+        /// Edits Availability endpoints
+        /// </summary>
+        /// <param name="availablilityId"></param>
+        /// <returns></returns>
+        [Authorize]
+        [Route("EditAvailablility")]
+        public IActionResult EditAvailablility(int availablilityId)
+        {
+            var Availablility = db.Avaliability.Find(availablilityId);
+            if (Availablility == null)
+                return NotFound();
+            var booking = db.Booking.Where(x => x.avaliability_id == availablilityId).ToList();
+            if (booking.Count() != 0)
+                return Ok(new { status = 0, message = "Can't edit this avaliability" });
+
+            db.Avaliability.Remove(Availablility);
+            db.SaveChanges();
+            return Ok(new { status = 1, message = "deleted successfully" });
+
+        }
+
+
 
         // create Individual Category of activity
         //[HttpPost]
@@ -668,7 +658,9 @@ namespace Core.Api.Controllers
                         title = activityCreatorModel.title,
                         type_id = activityCreatorModel.type_id,
                         description = activityCreatorModel.description,
-                        user_id = userid,
+                        has_individual_categories = activityCreatorModel.has_individual_categories,
+                        has_specific_capacity = activityCreatorModel.has_specific_capacity,
+                         user_id = userid,
                         isdeleted = false
                     };
                     db.Activity.Add(activity_add);
@@ -1028,7 +1020,7 @@ namespace Core.Api.Controllers
         }
 
         //(Request 8)
-        [Authorize]
+       // [Authorize]
         [HttpPost]
         [Route("Create_ActivityLength")]
         public IActionResult Create_ActivityLength([FromBody]BookingSettingModel bookingSettingModel, int activityId, int mode)
@@ -1037,12 +1029,17 @@ namespace Core.Api.Controllers
 
             if (activity != null)
             {
+                //added the has category and has capacity to this 
                 activity.Activity_length = bookingSettingModel.Activity_length;
                 activity.totalCapacity = bookingSettingModel.totalCapacity;
                 activity.min_capacity_group = bookingSettingModel.min_capacity_group;
                 activity.max_capacity_group = bookingSettingModel.max_capacity_group;
                 activity.capacityIsUnlimited = bookingSettingModel.capacityIsUnlimited;
-
+                activity.has_individual_categories = bookingSettingModel.has_individual_categories;
+                activity.has_specific_capacity = bookingSettingModel.has_specific_capacity;
+                var json = Newtonsoft.Json.JsonConvert.SerializeObject(bookingSettingModel.individual_categories);
+                activity.modified_date = DateTime.Now.Date;
+                activity.individual_categories= json;
                 if (mode == 2)
                 {
                     foreach (var individual in bookingSettingModel.individualCategories)
@@ -1060,9 +1057,10 @@ namespace Core.Api.Controllers
                                 return BadRequest();
                             old_individual.capacity = individual.capacity;
                         }
-                        db.SaveChanges();
+                       
                     }
-
+                    db.SaveChanges();
+                    return Ok(new { message = "activity length created successfully", activityId = activity.id, IndividualCategories = activity.individual_categories });
                 }
                 if (mode == 1)
                 {
@@ -1073,11 +1071,13 @@ namespace Core.Api.Controllers
                     }
                     activity.stepNumber = 8;   // 8 (Create Capacity & Length)
                     db.SaveChanges();
+                    return Ok(new { message = "activity length created successfully", activityId = activity.id,IndividualCategories =activity.individual_categories});
                 }
-                var individualCategories = db.Individual_Categories.Where(x => x.activityid == activity.id).Select(x => new { x.id, x.name, x.capacity, x.price });
-                return Ok(new { activityId = activity.id, IndividualCategories = individualCategories });
+                //var individualCategories = db.Individual_Categories.Where(x => x.activityid == activity.id).Select(x => new { x.id, x.name, x.capacity, x.price });
+                //return Ok(new { activityId = activity.id, IndividualCategories = individualCategories });
             }
-            return BadRequest();
+            return Ok(new { message="activity is null or empty"});
+
         }
 
         //(Request 9)
@@ -1284,109 +1284,7 @@ namespace Core.Api.Controllers
                 return Ok(new {PhotoURL= url });
             }
             return Ok(new { message = "PLZ , Check activity id" });
-        }
-
-        
-        //*********************************************
-        //
-        //[HttpPost]
-        //[Route("BookingSetting")]
-        //public IActionResult BookingSetting([FromBody]BookingSettingModel bookingSettingModel)
-        //{
-
-        //    var activity = db.Activity.Find(bookingSettingModel.activityid);
-        //    if (activity == null)
-        //    {
-        //        return BadRequest();
-        //    }
-        //    if (bookingSettingModel != null)
-        //    {
-        //        activity.notice_in_advance = bookingSettingModel.notice_in_advance;
-        //        activity.booking_window = bookingSettingModel.booking_window;
-        //        activity.bookingAvailableForIndividuals = bookingSettingModel.bookingAvailableForIndividuals;
-        //        activity.bookingAvailableForGroups = bookingSettingModel.bookingAvailableForGroups;
-        //        activity.Activity_length = bookingSettingModel.Activity_length;
-        //        activity.group_price = bookingSettingModel.group_price;
-        //        activity.totalCapacity = bookingSettingModel.totalCapacity;
-        //        activity.min_capacity_group = bookingSettingModel.min_capacity_group;
-        //        activity.max_capacity_group = bookingSettingModel.max_capacity_group;
-
-        //        foreach (var aval in bookingSettingModel.avaliabilities)
-        //        {
-        //            var avali = db.Avaliability.Find(aval.id);
-        //            Avaliability avaliability = new Avaliability
-        //            {
-        //                activity_id = bookingSettingModel.activityid,
-        //                activity_Start = avali.activity_Start,
-        //                activity_End = avali.activity_End,
-        //                isForGroup = avali.isForGroup
-        //            };
-        //            db.Avaliability.Add(avaliability);
-        //        }
-
-        //        foreach (var organizer in bookingSettingModel.activity_Organizers)
-        //        {
-        //            var organize = db.Activity_Organizer.Find(organizer.id);
-        //            Activity_Organizer activity_Organizer = new Activity_Organizer
-        //            {
-        //                activity_id = bookingSettingModel.activityid,
-        //                name = organize.name,
-        //                mail = organize.mail,
-        //                mobile = organize.mobile,
-        //                Organizer_Typeid = organize.Organizer_Typeid  //----
-        //            };
-        //            db.Activity_Organizer.Add(activity_Organizer);
-        //        }
-
-        //        foreach (var individual in bookingSettingModel.individualCategories)
-        //        {
-        //            var individuall = db.Individual_Categories.Find(individual.id);
-        //            IndividualCategory individualCategory = new IndividualCategory
-        //            {
-        //                activityid = bookingSettingModel.activityid,
-        //                name = individuall.name,
-        //                price = individuall.price,
-        //                price_after_discount = individuall.price_after_discount,
-        //                capacity = individuall.capacity
-        //            };
-        //            db.Individual_Categories.Add(individualCategory);
-        //        }
-
-        //        db.SaveChanges();
-        //    }
-        //    return Ok(activity);
-        //}
-
-
-        //[HttpPost]
-        //[Route("Api/Activity/Complete_Create_Activity")]
-        //public IActionResult Complete_Create_Activity([FromBody]Activity activity)
-        //{
-        //    if (activity != null)
-        //    {
-        //        if (activity.id != 0)
-        //        {
-        //            var com_activity = db.Activity.Include(x=>x.Activity_Add_Ons).Include(x=>x.Activity_Option)
-        //                .Include(x=>x.Activity_Photos).Include(x=>x.Activity_Rules).Include(x=>x.Activity_Organizer)
-        //                .FirstOrDefault(x=>x.id==activity.id);
-
-        //            com_activity.booking_window = activity.booking_window;
-        //            com_activity.notice_in_advance = activity.notice_in_advance;
-        //            com_activity.Activity_length = activity.Activity_length;
-        //            com_activity.max_number_group = activity.max_number_group;
-        //            com_activity.min_number_group = activity.min_number_group;
-        //            com_activity.totalCapacity = activity.totalCapacity;
-        //            com_activity.Individual_Categories = com_activity.Individual_Categories;
-        //            com_activity.price_private_group = activity.price_private_group;
-        //            com_activity.Activity_Organizer = activity.Activity_Organizer;
-
-        //            db.SaveChanges();
-        //            return Ok(com_activity);
-        //        }
-        //    }
-        //    return BadRequest(new { message = "Check Data" });
-        //}
-
+        }     
 
 
         [Route("DeleteActivity")]
@@ -1402,49 +1300,204 @@ namespace Core.Api.Controllers
             db.SaveChanges();
             return Ok(new { status=1});
         }
-        //[HttpGet]
-        //[Route("Api/Activity/ActivityInfo")]
-        //public IActionResult ActivityInfo(int id)
-        //{
 
-        //    var activity = db.Activity.Find(id);
-        //    if (activity != null)
-        //    {
-        //        bool title = (activity.title.Count() != 0) & (activity.type_id != 0) & (activity.description.Length != 0) &
-        //                      (db.Activity_Option.Where(x => x.activity_id == id).Count() != 0);
+        [HttpGet]
+        [Authorize]
+        [Route("ActivityListing")]
+        public IActionResult ActivityListing()
+        {
+            int userid = int.Parse(HttpContext.User.FindFirst("userId").Value);
+            if (userid != null)
+            {
+                var useractivitylisting = db.Activity.Where(a => a.user_id == userid).AsEnumerable();
+                return Ok(new { useractivitylisting });
+            }            
+            return BadRequest(new { message ="Invalid request, user does not exist"})  ;
+        }
+         [HttpGet]
+        [Route("GetOnlineActivity")]
+       
+        public async Task<IActionResult> GetOnlineActivity(bool status, bool isCompleted)
+        {
+            var onlineactivity =  db.Activity.Where(c =>  c.isCompleted == isCompleted ? true : false).AsEnumerable();
+            var onlineact = onlineactivity.Select(d => new UserOnlineActivity
+            {
+                ActivityCoverPhotos = d.Activity_Photos.Select(f => new ActivityCoverPhotos
+                {
+                    activity_id = f.activity_id.Value,
+                    url = f.url,
+                    cover_photo = f.cover_photo
+                }),
+                ActivityId = d.id,
+                Title = d.title,
+                LastEditedDate = d.modified_date
+            }
+                  ).OrderByDescending(c => c.ActivityId).AsEnumerable();
+            return Ok(new { message = "Successful", activity = onlineact });
+        }
+        [HttpGet]
+        [Route("GetUserOnlineActivity")]
 
-        //        //bool photo = db.Activity_Photos.Where(x => x.activity_id == id) == null ? false : true;
-        //        bool add_ons = db.Activity_Add_Ons.Where(x => x.activity_id == id) == null ? false : true;
+        public async Task<IActionResult> GetUserOnlineActivity(bool status, bool isCompleted)
+        {
+            //; 
+            var userid = GetUserId();          
+            if(!isCompleted)
+            {
 
-        //        bool location = activity.location_Latitude.HasValue & activity.location_Langitude.HasValue
-        //                       & activity.meeting_point_Langitude.HasValue & activity.meeting_point_Latitude.HasValue;
+                ///  var onlineactivity =await .ToListAsync();
 
-        //        bool rules = (db.Activity_Rule.Where(x => x.activity_id == id) == null && activity.requirements != null) ? false : true;
+                var onlineact =await db.Activity.Where(c => c.isCompleted == false && c.user_id==userid).Select(d => new UserOnlineActivity
+                {
+                    ActivityCoverPhotos = d.Activity_Photos.Where(c => c.activity_id == d.id).Select(f => new ActivityCoverPhotos
+                    {
+                        activity_id = f.activity_id.Value,
+                        url = f.url,
+                        cover_photo = f.cover_photo
+                    }),
+                    UserId = d.user_id,
+                    ActivityId = d.id,
+                    Title = d.title,
+                    LastEditedDate = d.modified_date
+                }
+                       ).OrderByDescending(c => c.ActivityId).Where(f => f.UserId == userid).Select(c => new UserOnlineActivity
+                       {
+                           ActivityCoverPhotos = c.ActivityCoverPhotos,
+                           ActivityId = c.ActivityId,
+                           Title = c.Title,
+                           LastEditedDate = c.LastEditedDate
+                       }).ToListAsync();
+                if (onlineact != null)
+                {
+                    return Ok(new { message = "Successful",online="online", activity = onlineact });
+                }
+            }
+            else if(isCompleted)
+            {
 
-        //        return Ok(new ActivityInfo
-        //        {
-        //            //Title = title,
-        //            //Photos = photo,
-        //            //Add_Ons = add_ons,
-        //            //Locations = location,
-        //            //Rules = rules,
-        //            //IsCompleted = (title & photo & rules & location & add_ons)
-        //        });
-        //    }
+                var onlineact = await db.Activity.Where(c => c.isCompleted == true && c.user_id == userid).Select(d => new UserOnlineActivity
+                {
+                    ActivityCoverPhotos = d.Activity_Photos.Where(c => c.activity_id == d.id).Select(f => new ActivityCoverPhotos
+                    {
+                        activity_id = f.activity_id.Value,
+                        url = f.url,
+                        cover_photo = f.cover_photo
+                    }),
+                    UserId = d.user_id,
+                    ActivityId = d.id,
+                    Title = d.title,
+                    LastEditedDate = d.modified_date
+                }
+                       ).OrderByDescending(c => c.ActivityId).Where(f => f.UserId == userid).Select(c => new UserOnlineActivity
+                       {
+                           ActivityCoverPhotos = c.ActivityCoverPhotos,
+                           ActivityId = c.ActivityId,
+                           Title = c.Title,
+                           LastEditedDate = c.LastEditedDate
+                       }).ToListAsync();
+                if (onlineact != null)
+                {
+                    return Ok(new { message = "Successful", offline = "offline", activity = onlineact });
+                }
+            }    
 
-        //    else
-        //    {
-        //        return Ok(new ActivityInfo
-        //        {
-        //            Title = false,
-        //            Photos = false,
-        //            Add_Ons = false,
-        //            Locations = false,
-        //            Rules = false,
-        //            IsCompleted = false
-        //        });
-        //    }
-        // }
+            return Ok(new { message = "Successful", activity = new List<UserOnlineActivity>() });
+        }
+     
+        [HttpGet]
+        [Route("GetActivityOption")]
+       
+        public IActionResult GetActivityOption(string activityid)
+        {
+            ;
+            var activity_id = int.Parse(activityid);
+            var activityoptions = db.Activity_Option.Where(a => a.activity_id == activity_id).Select(f=> new GetActivityOption {              
+                title=f.Activity.title,
+                description=f.Activity.description,
+                Activity_Options=f.Activity.Activity_Option.Select(d=> new Activity_Options
+                {
+                    activityoptionid=d.id,
+                    option_id=d.option_id.ToString(),
+                    fromAge=d.fromAge,
+                    toAge=d.toAge,
+                    name=d.Option.name
+                })
+            }).GroupBy(c=>c.title).Select(f=>f.FirstOrDefault()).AsEnumerable();
+            if (activityoptions != null)
+            {
+                return Ok(new { message = "Successful", activityoptions = activityoptions });
+            }
+            return Ok(new { message = "Successful but no activity matches", activityoptions = ""});
+        }
+
+        [HttpPatch]
+        [Route("EditActivity")]
+        [Authorize]
+        public IActionResult EditActivity([FromBody] GetActivityOption editActivity, string activityid)
+        {
+            int activity_id = int.Parse(activityid);
+            int userid = GetUserId();
+            var activityoption = db.Activity_Option.Where(a => a.activity_id == activity_id && a.Activity.user_id == userid).Select(c=>c).ToList();          
+            var listofactivityoptions = editActivity.Activity_Options;
+            foreach (var options in listofactivityoptions)
+            {
+                UpdateEditActivity(options, activity_id);
+            }
+            try
+            {
+                var updateactvitytable = db.Activity.Where(c => c.id == activity_id).FirstOrDefault();
+                updateactvitytable.title = editActivity.title;
+                updateactvitytable.description = editActivity.description;
+                updateactvitytable.modified_date = DateTime.UtcNow;
+                db.SaveChanges();
+                return Ok(new
+                {
+                    message = "Successful",
+                    activity = activity_id
+                });
+            }
+            catch (Exception e)
+            {
+                return Ok(new
+                {
+                    message = $"Error Occured {e.Message}",
+                    activity = activity_id
+                });
+            }
+            
+            
+        }
+        public void UpdateEditActivity()
+        {
+
+        }
+        public void UpdateEditActivity(Activity_Options options, int activity_id)
+        {
+            var optid = int.Parse(options.option_id);
+            var data = db.Activity_Option.FirstOrDefault(d => d.id == options.activityoptionid);
+            if (data != null)
+            {
+                data.activity_id = activity_id;
+               data.option_id = optid;
+               data.fromAge = options.fromAge;
+               data.toAge = options.toAge;
+                db.SaveChanges();
+            }
+            else
+            {
+                var newoptionadd = new Activity_Option
+                {
+                    activity_id = activity_id,
+                    option_id = int.Parse(options.option_id),
+                    fromAge = options.fromAge,
+                    toAge = options.toAge
+                };
+                db.Activity_Option.Add(newoptionadd);
+                db.SaveChanges();
+            }
+           
+        }
+
     }
 
 }

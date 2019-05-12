@@ -9,6 +9,8 @@ namespace Core.Api.Models
         public string title { get; set; }
         public string description { get; set; }
         public string activity_Location { get; set; }
+        public bool? has_individual_categories { get; set; }
+        public bool? has_specific_capacity { get; set; }
         public string meeting_Location { get; set; }
         public Nullable<decimal> activity_Lat { get; set; }
         public Nullable<decimal> activity_Lang { get; set; }
@@ -74,6 +76,7 @@ namespace Core.Api.Models
         public string starthour { get; set; }
         public string endhour { get; set; }
         public Nullable<int> isForGroup { get; set; }
+        public Nullable<int> isForIndividual { get; set; }
      //   public IEnumerable<AvaliabilityPricing> avaliabilityPricings { get; set; }
 
     }

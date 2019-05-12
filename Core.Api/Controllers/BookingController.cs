@@ -8,6 +8,8 @@ using System.IO;
 using Core.Api.Helper;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Authorization;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace Core.Api.Controllers
 {
@@ -221,7 +223,8 @@ namespace Core.Api.Controllers
                         booking_amount = bookingModel.booking_amount,
                         activity_id = bookingModel.activity_id,
                         avaliability_id = bookingModel.avaliability_id,
-                        bookingDate=DateTime.Now
+                        bookingDate=DateTime.Now,
+                        time_option=bookingModel.time_option
                     };
 
                     db.Booking.Add(booking);
@@ -606,7 +609,7 @@ namespace Core.Api.Controllers
             if (activity == null)
                 return BadRequest();
 
-            var reservations = db.Avaliability.Include(x => x.Avaliability_Pricings).Where(a => a.activity_id == activityid).Select(c => new reservation
+            var reservations = db.Avaliability.Where(a => a.activity_id == activityid).Select(c => new reservation
             {
                 totalCapacity = c.Activity.totalCapacity,
                 // Activity_group_price = a.Activity.group_price,
@@ -617,14 +620,15 @@ namespace Core.Api.Controllers
                 isForGroup = c.isForGroup,
                 total_tickets = c.total_tickets,
                  BookinfInfo = c.Activity.Bookings.Where(g => g.activity_id == activityid).AsEnumerable(),
-                //individualCategories=a.Activity.Individual_Categories.Select(s=> new IndividualCategoryModel {
-                //    id=s.id,
-                //    name=s.name,
-                //    capacity=s.capacity,
-                //    price=s.price,
-                //    price_after_discount=s.price_after_discount,
-                //    activity_Id = s.activityid
-                //}),
+                individualCategories = c.Activity.Individual_Categories.Select(s => new IndividualCategoryModel
+                {
+                    id = s.id,
+                    name = s.name,
+                    capacity = s.capacity,
+                    price = s.price,
+                    price_after_discount = s.price_after_discount,
+                    activity_Id = s.activityid
+                }),
                 avaliabilityPricing = c.Avaliability_Pricings.Select(f=> new AvaliabilityPricing {
                     id =f.id,
                 individualCategoryId= f.individualCategoryId,
@@ -676,7 +680,7 @@ namespace Core.Api.Controllers
         [Route("GetActivityByDate")]
         public IActionResult GetActivityByDate(DateTime date)
         {
-            var activity = db.Avaliability.Include(x => x.Avaliability_Pricings).Where(f => f.activity_Start.Value.Date == date.Date).Select(x => new
+            var activity = db.Avaliability.Where(f => f.activity_Start.Value.Date == date.Date).Select(x => new
             {
                 avaliabilityid = x.id,
                 x.Activity.title,
@@ -722,6 +726,59 @@ namespace Core.Api.Controllers
             return BadRequest(new { message = "Request returned empty data" });
         }
 
+        [HttpPost]
+        [Route("ModifyCalender")]
+        public async Task<IActionResult> ModifyCalender([FromBody] CalenderActivity calenderActivityModel, int activityid)
+        {
+            //Total Capacity
+            var response = new Dictionary<string, string>();
+            var activity = db.Activity.Find(activityid);
+            if(activity != null)
+            {
+                var activityupdates = calenderActivityModel.availability
+                    .Where(ac => ac.activity_id == activityid).Select(f=> new Avaliability
+                    {
+                        activity_id =f.activity_id,
+                        activity_Start=f.activity_Start,
+                        activity_End= f.activity_End,
+                        isForGroup=f.isForGroup,
+                        isForIndividual=f.isForIndividual,
+                        group_Price=f.group_Price,
+                        startdate=f.startdate,
+                        enddate=f.enddate,
+                        starthour=f.starthour,
+                        endhour=f.endhour,
+                        reoccuring=f.reoccuring
+
+                    }) ;
+                var individualcategory = calenderActivityModel.availability.Select(c => c.individual_categories.Select(d=> new IndividualCategory {
+                    activityid= d.activityid,
+                    name=d.name,
+                    price=d.price,
+                    price_after_discount=d.price_after_discount,
+                    capacity=d.capacity
+                }));
+
+                foreach (var activityupdate in activityupdates)
+                {
+                   await db.Avaliability.AddRangeAsync(activityupdate);
+                 
+                }
+                foreach (var individualcat in individualcategory)
+                {
+                    foreach (var ndividual in individualcat)
+                    {
+                        await db.Individual_Categories.AddRangeAsync(ndividual);
+                    }                   
+                }
+                  await db.SaveChangesAsync();
+                return Ok(new { message = "Successfully submitted", activityid });
+            }
+            else
+            {
+                return BadRequest(new { message = "Empty object sent. body cannot be empty", activityid });
+            }
+        }
 
         #endregion
     }

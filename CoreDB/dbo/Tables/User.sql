@@ -28,6 +28,8 @@
     [user_name]              NVARCHAR (MAX) NULL,
     [UserPhoto_Url]          NVARCHAR (MAX) NULL,
     [tempUser]               BIT            DEFAULT ((0)) NOT NULL,
+    [email] NVARCHAR(255) NULL, 
+    [registrationType] NVARCHAR(255) NULL , 
     CONSTRAINT [PK_User] PRIMARY KEY CLUSTERED ([id] ASC),
     CONSTRAINT [FK_User_Banks_bank_id] FOREIGN KEY ([bank_id]) REFERENCES [dbo].[Banks] ([bank_id]),
     CONSTRAINT [FK_User_Identification_types_identification_type] FOREIGN KEY ([identification_type]) REFERENCES [dbo].[Identification_types] ([identification_type_id]),

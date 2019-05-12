@@ -19,15 +19,24 @@ namespace Core.Api.Models
         public bool capacityIsUnlimited { get; set; }
         public bool apply_discount { get; set; }
         public float price_discount { get; set; }
-
-
+        public bool? has_individual_categories { get; set; }
+        public bool? has_specific_capacity { get; set; }
+        public List<individual_categories> individual_categories { get; set; }
         public IEnumerable<Avaliability_Pricing> avalibilityPricingModels { get; set; }
         public  IEnumerable<Avaliability> avalibilityModels { get; set; }
         public AvalibilityModel avalibilityModel { get; set; }
         public IEnumerable<IndividualCategory> individualCategories { get; set; }  //****   
         public IEnumerable<Activity_Organizer> activity_Organizers { get; set; }
+        
    
        // public bool apply_discount { get; set; }
+    }
+    public class individual_categories
+    {
+        public string name { get; set; }
+        public string capacity { get; set; }
+        public string price { get; set; }
+        public string price_after_discount { get; set; }
     }
     public class AvalibilityModel
     {

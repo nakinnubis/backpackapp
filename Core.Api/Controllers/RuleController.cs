@@ -41,16 +41,36 @@ namespace Core.Api.Controllers
         [Route("GetAllRules")]
         public IActionResult GetAllRules()  //***
         {
-            int userid = int.Parse(HttpContext.User.FindFirst("userId").Value);
 
-            var Rules = db.Rule.Where(x=> (x.add_by == userid | x.add_by == null) & x.isdeleted == false).
-                                          Select(x => new { x.id,
-                                                            x.description,
-                                                            intial = x.add_by == null ? true : false }).ToList();
-            if (Rules != null)
-                return Ok(Rules);
-            else
-                return NoContent();
+            int userid = int.Parse(this.HttpContext.User.FindFirst("userId").Value);
+            var list1 = this.db.Rule.Where(x => x.add_by == (int?)userid & x.isdeleted == (bool?)false).Select(x => new
+            {
+                id = x.id,
+                description = x.description,
+                definedby = string.Format("{0}", (object)userid),
+                intial = true
+            }).ToList();
+            var list2 = this.db.Rule.Where(x => (x.add_by == (int?)userid | x.add_by == new int?()) & x.isdeleted == (bool?)false).Select(x => new
+            {
+                id = x.id,
+                description = x.description,
+                definedby = "others",
+                intial = x.add_by == new int?() ? true : false
+            }).ToList();
+            var datas = list1.Concat(list2);
+            if (list2 != null || list1 != null)
+                return Ok(datas);
+            return NoContent();
+            //int userid = int.Parse(HttpContext.User.FindFirst("userId").Value);
+
+            //var Rules = db.Rule.Where(x=> (x.add_by == userid | x.add_by == null) & x.isdeleted == false).
+            //                              Select(x => new { x.id,
+            //                                                x.description,
+            //                                                intial = x.add_by == null ? true : false }).ToList();
+            //if (Rules != null)
+            //    return Ok(Rules);
+            //else
+            //    return NoContent();
         }
 
 
