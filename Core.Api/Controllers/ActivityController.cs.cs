@@ -1338,66 +1338,71 @@ namespace Core.Api.Controllers
         [HttpGet]
         [Route("GetUserOnlineActivity")]
 
-        public async Task<IActionResult> GetUserOnlineActivity(bool status, bool isCompleted)
+        public IActionResult GetUserOnlineActivity(bool isCompleted)
         {
             //; 
-            var userid = GetUserId();          
-            if(!isCompleted)
+            // var userid = GetUserId();
+            var userid = GetUserId();
+            if (isCompleted ==false)
             {
 
                 ///  var onlineactivity =await .ToListAsync();
 
-                var onlineact =await db.Activity.Where(c => c.isCompleted == false && c.user_id==userid).Select(d => new UserOnlineActivity
+                var onlineact = db.Activity.Where(c => c.user_id == userid && !c.isCompleted).ToList();
+                var usractivity = onlineact.Select(d => new
                 {
-                    ActivityCoverPhotos = d.Activity_Photos.Where(c => c.activity_id == d.id).Select(f => new ActivityCoverPhotos
+                    ActivityCoverPhotos = db.Activity_Photos.Where(c => c.activity_id == d.id).Select(f => new
                     {
                         activity_id = f.activity_id.Value,
                         url = f.url,
                         cover_photo = f.cover_photo
                     }),
-                    UserId = d.user_id,
+                    user = d.user_id,
                     ActivityId = d.id,
                     Title = d.title,
-                    LastEditedDate = d.modified_date
+                    LastEditedDate = d.modified_date ?? d.creation_date
                 }
-                       ).OrderByDescending(c => c.ActivityId).Where(f => f.UserId == userid).Select(c => new UserOnlineActivity
-                       {
-                           ActivityCoverPhotos = c.ActivityCoverPhotos,
-                           ActivityId = c.ActivityId,
-                           Title = c.Title,
-                           LastEditedDate = c.LastEditedDate
-                       }).ToListAsync();
+                    ).OrderByDescending(c => c.ActivityId).Select(c => new
+                    {
+                        user = c.user,
+                        ActivityCoverPhotos = c.ActivityCoverPhotos,
+                        ActivityId = c.ActivityId,
+                        Title = c.Title,
+                        LastEditedDate = c.LastEditedDate
+                    }).ToList();
                 if (onlineact != null)
                 {
-                    return Ok(new { message = "Successful",online="online", activity = onlineact });
+                    return Ok(new { message = "Successful",online="online", activity = usractivity, userid = userid });
                 }
             }
-            else if(isCompleted)
+            else if(isCompleted==true)
             {
 
-                var onlineact = await db.Activity.Where(c => c.isCompleted == true && c.user_id == userid).Select(d => new UserOnlineActivity
-                {
-                    ActivityCoverPhotos = d.Activity_Photos.Where(c => c.activity_id == d.id).Select(f => new ActivityCoverPhotos
-                    {
-                        activity_id = f.activity_id.Value,
-                        url = f.url,
-                        cover_photo = f.cover_photo
-                    }),
-                    UserId = d.user_id,
-                    ActivityId = d.id,
-                    Title = d.title,
-                    LastEditedDate = d.modified_date
-                }
-                       ).OrderByDescending(c => c.ActivityId).Where(f => f.UserId == userid).Select(c => new UserOnlineActivity
+                var onlineact = db.Activity.Where(c => c.user_id == userid &&c.isCompleted).ToList();
+                   var usractivity = onlineact.Select(d => new 
+                     {
+                         ActivityCoverPhotos = db.Activity_Photos.Where(c => c.activity_id == d.id).Select(f => new 
+                         {
+                             activity_id = f.activity_id.Value,
+                             url = f.url,
+                             cover_photo = f.cover_photo
+                         }),
+                       user= d.user_id,
+                         ActivityId = d.id,
+                         Title = d.title,
+                         LastEditedDate = d.modified_date ?? d.creation_date
+                     }
+                       ).OrderByDescending(c => c.ActivityId).Select(c => new 
                        {
+                           user =c.user,
                            ActivityCoverPhotos = c.ActivityCoverPhotos,
                            ActivityId = c.ActivityId,
                            Title = c.Title,
                            LastEditedDate = c.LastEditedDate
-                       }).ToListAsync();
+                       }).ToList();
                 if (onlineact != null)
                 {
-                    return Ok(new { message = "Successful", offline = "offline", activity = onlineact });
+                    return Ok(new { message = "Successful", offline = "offline", activity = usractivity, userid= userid });
                 }
             }    
 
@@ -1407,22 +1412,15 @@ namespace Core.Api.Controllers
         [HttpGet]
         [Route("GetActivityOption")]
        
-        public IActionResult GetActivityOption(string activityid)
-        {
-            ;
-            var activity_id = int.Parse(activityid);
-            var activityoptions = db.Activity_Option.Where(a => a.activity_id == activity_id).Select(f=> new GetActivityOption {              
-                title=f.Activity.title,
-                description=f.Activity.description,
-                Activity_Options=f.Activity.Activity_Option.Select(d=> new Activity_Options
-                {
-                    activityoptionid=d.id,
-                    option_id=d.option_id.ToString(),
-                    fromAge=d.fromAge,
-                    toAge=d.toAge,
-                    name=d.Option.name
-                })
-            }).GroupBy(c=>c.title).Select(f=>f.FirstOrDefault()).AsEnumerable();
+        public IActionResult GetActivityOption()
+        {            
+            var activityoptions = db.Option.Select(f=> new GetActivityOptionModel {
+                option_id = f.id,
+                fromAge = f.fromAge.Value,
+                _class = f._class,
+                toAge=f.toAge.Value,
+                name = f.name
+            }).AsEnumerable();
             if (activityoptions != null)
             {
                 return Ok(new { message = "Successful", activityoptions = activityoptions });

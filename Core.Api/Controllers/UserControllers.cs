@@ -18,7 +18,7 @@ namespace Core.Api.Controllers
     [Route("api/User")]
     [ApiController]
     [EnableCors("AllowOrigin")]
-    [Authorize]
+   // [Authorize]
     public class UserController : BaseController
     {
 
@@ -463,7 +463,7 @@ namespace Core.Api.Controllers
         }
 ///Sly just added this 6th of May 2019
        
-        [HttpPatch]
+        [HttpPost]
         [Route("VerificationIdentifcation")]
         public async Task<IActionResult> VerificationIdentifcation([FromBody]VerificationIdentifcation verificationIdentifcation,string userId)
         {
@@ -471,8 +471,8 @@ namespace Core.Api.Controllers
             {
                 try
                 {
-                   
-                    int user_id = int.Parse(userId);
+                    //  int.Parse(userId);
+                    int user_id = 5;
                     var user = db.User.Find(user_id);                    
                     SaveImageToPath(verificationIdentifcation.base64Img, user, "Organizationimages");
                     var orgdata = new UserIdentification
@@ -483,11 +483,11 @@ namespace Core.Api.Controllers
                         identification_type = verificationIdentifcation.IdentificationType,
                         identification_number = verificationIdentifcation.IdentificationNumber,
                         expiry_date = verificationIdentifcation.ExpiryDate,
-                        id_copy = GetUserImage.OnlineImagePathForUserPhoto + Path.Combine(user.id + ".png"),
+                        id_copy = GetUserImage.OrganizationPhoto + Path.Combine($"{user.id}.png"),
                     };
                     await db.UserIdentifications.AddAsync(orgdata);
                     await db.SaveChangesAsync();
-                    return Ok(new { message = "successfully submitted" });
+                    return Ok(new { message = "successfully submitted" ,imageurl= GetUserImage.OrganizationPhoto + Path.Combine($"{user.id}.png") });
                 }
                 catch (Exception e)
                 {
@@ -513,9 +513,9 @@ namespace Core.Api.Controllers
                     var orgdata = db.User.FirstOrDefault(o => o.id == user_id);
                     var bank = db.Banks.FirstOrDefault(b => b.bank_name_en == bankAccountPayment.BankName || b.bank_name_ar == bankAccountPayment.BankName);
                     orgdata.bank_id = bank.bank_id;
-                    orgdata.receive_cash_payment = bankAccountPayment.isCash;
-                    orgdata.receive_online_payment = bankAccountPayment.isOnlinePayment;
-                    orgdata.recieve_money_transfer = bankAccountPayment.Transfer;
+                    orgdata.receive_cash_payment = bankAccountPayment.receive_cash_payment;
+                    orgdata.receive_online_payment = bankAccountPayment.receive_online_payment;
+                    orgdata.recieve_money_transfer = bankAccountPayment.recieve_money_transfer;
                     orgdata.IBAN_number = bankAccountPayment.IBankNumber;
                     await db.SaveChangesAsync();
                     return Ok(new { message = "successfully updated" });
@@ -535,21 +535,14 @@ namespace Core.Api.Controllers
         {
             try
             {
+                //GetUserId();
                 int userid = GetUserId();
                 if (userid > 0)
                 {
                     var reguser = db.User.Find(userid);
-                    var orgdata = db.User.FirstOrDefault(o => o.id == userid);
-                    var getbankpreference = new BankAccountPayment
-                    {
-                        isCash = orgdata.receive_cash_payment,
-                        isOnlinePayment = orgdata.receive_online_payment,
-                        Transfer = orgdata.recieve_money_transfer,
-                        BankName = orgdata.Banks.bank_name_en,
-                        IBankNumber = orgdata.IBAN_number
-                    };
+                    var orgdata = db.User.Select(c=> new { c.id,receive_cash_payment=c.receive_cash_payment, receive_online_payment =c.receive_online_payment, recieve_money_transfer=c.recieve_money_transfer, bank_name_en=c.Banks.bank_name_en, IBankNumber=c.IBAN_number }).FirstOrDefault(o => o.id == userid);
+                    var getbankpreference = orgdata;
                     return Ok(new { message = "successful", bankpreference = getbankpreference });
-
                 }
 
                 return Ok(new { message = "bad Request!!!", bankpreference = "" });

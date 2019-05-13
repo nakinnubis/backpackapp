@@ -102,4 +102,7 @@
     <Build Include="dbo\Tables\__EFMigrationsHistory.sql" />
     <Build Include="dbo\Sequences\ticket_number.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <RefactorLog Include="CoreDB.refactorlog" />
+  </ItemGroup>
 </Project>

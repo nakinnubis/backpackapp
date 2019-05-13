@@ -22,7 +22,14 @@ namespace Core.Api.Helper
                 //return "myimages/Users_Photo/";
             }
         }
-
+        public static string Org
+        {
+            get
+            {
+                return "Organizationimages/";
+                //return "myimages/Users_Photo/";
+            }
+        }
         public static string ImagePathForActivityTypePhoto
         {
             get
@@ -47,7 +54,14 @@ namespace Core.Api.Helper
                 return "http://petroquestdata.com/" + ImagePathForUserPhoto;// +"/";
             }
         }
-
+        public static string OrganizationPhoto
+        {
+            get
+            {
+                //change to current hosted url
+                return "http://petroquestdata.com/" + Org;// +"/";
+            }
+        }
         public static string OnlineImagePathForActivityTypePhoto
         {
             get

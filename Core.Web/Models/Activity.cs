@@ -56,6 +56,7 @@ namespace Core.Web.Models
         public bool bookingAvailableForIndividuals { get; set; }
         public bool bookingAvailableForGroups { get; set; }
         public bool isdeleted { get; set; }
+        public DateTime? creation_date { get; set; }
         // 1 (create Title,Description,Type)
         // 2 (Create Photo)
         // 3 (Create Addons)

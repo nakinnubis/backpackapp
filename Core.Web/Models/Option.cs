@@ -18,7 +18,9 @@ namespace Core.Web.Models
         public string description { get; set; }
         public string icon { get; set; }
         public bool haveAge { get; set; }
-  
+        public int? fromAge { get; set; }
+        public int? toAge { get; set; }
+        public string _class{ get;set;}
         public virtual ICollection<Activity_Option> Activity_Option { get; set; }
     }
 }

@@ -91,25 +91,25 @@ namespace Core.Api
             {
                 FileProvider = new PhysicalFileProvider(
                     Path.Combine(Directory.GetCurrentDirectory(), "Activity_Image")),
-                RequestPath = "/MyImages"
+                RequestPath = "/Activity_Image"
             });
 
             app.UseDirectoryBrowser(new DirectoryBrowserOptions
             {
                 FileProvider = new PhysicalFileProvider(
-                    Path.Combine(Directory.GetCurrentDirectory(), "Activity_Image")),
+                    Path.Combine(Directory.GetCurrentDirectory(), "MyImages")),
                 RequestPath = "/MyImages"
             });
             app.UseDirectoryBrowser(new DirectoryBrowserOptions
             {
                 FileProvider = new PhysicalFileProvider(
-                  Path.Combine(Directory.GetCurrentDirectory(), "Activity_Image")),
+                  Path.Combine(Directory.GetCurrentDirectory(), "Customerprofile")),
                 RequestPath = "/Customerprofile"
             });
             app.UseDirectoryBrowser(new DirectoryBrowserOptions
             {
                 FileProvider = new PhysicalFileProvider(
-               Path.Combine(Directory.GetCurrentDirectory(), "Activity_Image")),
+               Path.Combine(Directory.GetCurrentDirectory(), "Organizationimages")),
                 RequestPath = "/Organizationimages"
             });
             app.UseStaticFiles(new StaticFileOptions
@@ -119,32 +119,11 @@ namespace Core.Api
                 RequestPath = "/Userimages"
             });
 
-            app.UseDirectoryBrowser(new DirectoryBrowserOptions
-            {
-                FileProvider = new PhysicalFileProvider(
-                    Path.Combine(Directory.GetCurrentDirectory(), "Userimages")),
-                RequestPath = "/Userimages"
-            });
-
             app.UseStaticFiles(new StaticFileOptions
             {
                 FileProvider = new PhysicalFileProvider(
                Path.Combine(Directory.GetCurrentDirectory(), "ActivityTypeImages")),
                 RequestPath = "/ActivityTypeImages"
-            });
-
-            app.UseDirectoryBrowser(new DirectoryBrowserOptions
-            {
-                FileProvider = new PhysicalFileProvider(
-                    Path.Combine(Directory.GetCurrentDirectory(), "ActivityTypeImages")),
-                RequestPath = "/ActivityTypeImages"
-            });
-
-            app.UseStaticFiles(new StaticFileOptions
-            {
-                FileProvider = new PhysicalFileProvider(
-                   Path.Combine(Directory.GetCurrentDirectory(), "Addons")),
-                RequestPath = "/Addons"
             });
 
             app.UseDirectoryBrowser(new DirectoryBrowserOptions
@@ -161,12 +140,7 @@ namespace Core.Api
                 RequestPath = "/ActivityOptions"
             });
 
-            app.UseDirectoryBrowser(new DirectoryBrowserOptions
-            {
-                FileProvider = new PhysicalFileProvider(
-                    Path.Combine(Directory.GetCurrentDirectory(), "ActivityOptions")),
-                RequestPath = "/ActivityOptions"
-            });
+           
 
         }
     }
