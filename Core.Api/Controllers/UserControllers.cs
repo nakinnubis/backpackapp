@@ -18,7 +18,7 @@ namespace Core.Api.Controllers
     [Route("api/User")]
     [ApiController]
     [EnableCors("AllowOrigin")]
-   // [Authorize]
+    [Authorize]
     public class UserController : BaseController
     {
 
@@ -472,7 +472,7 @@ namespace Core.Api.Controllers
                 try
                 {
                     //  int.Parse(userId);
-                    int user_id = 5;
+                    int user_id = int.Parse(userId);
                     var user = db.User.Find(user_id);                    
                     SaveImageToPath(verificationIdentifcation.base64Img, user, "Organizationimages");
                     var orgdata = new UserIdentification

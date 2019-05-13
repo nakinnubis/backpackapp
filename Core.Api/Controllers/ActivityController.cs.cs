@@ -1342,7 +1342,7 @@ namespace Core.Api.Controllers
         {
             //; 
             // var userid = GetUserId();
-            var userid = GetUserId();
+            var userid = GetUserId(); ;
             if (isCompleted ==false)
             {
 
@@ -1360,7 +1360,8 @@ namespace Core.Api.Controllers
                     user = d.user_id,
                     ActivityId = d.id,
                     Title = d.title,
-                    LastEditedDate = d.modified_date ?? d.creation_date
+                    LastEditedDate = d.modified_date ?? d.creation_date,
+                    rating = db.Reviews.Where(c => c.activity_id == d.id).AsEnumerable()
                 }
                     ).OrderByDescending(c => c.ActivityId).Select(c => new
                     {
@@ -1368,7 +1369,8 @@ namespace Core.Api.Controllers
                         ActivityCoverPhotos = c.ActivityCoverPhotos,
                         ActivityId = c.ActivityId,
                         Title = c.Title,
-                        LastEditedDate = c.LastEditedDate
+                        LastEditedDate = c.LastEditedDate,
+                        Rating=c.rating
                     }).ToList();
                 if (onlineact != null)
                 {
@@ -1390,16 +1392,18 @@ namespace Core.Api.Controllers
                        user= d.user_id,
                          ActivityId = d.id,
                          Title = d.title,
-                         LastEditedDate = d.modified_date ?? d.creation_date
-                     }
-                       ).OrderByDescending(c => c.ActivityId).Select(c => new 
-                       {
-                           user =c.user,
-                           ActivityCoverPhotos = c.ActivityCoverPhotos,
-                           ActivityId = c.ActivityId,
-                           Title = c.Title,
-                           LastEditedDate = c.LastEditedDate
-                       }).ToList();
+                         LastEditedDate = d.modified_date ?? d.creation_date,
+                      rating = db.Reviews.Where(c=>c.activity_id==d.id).AsEnumerable()
+                   }
+                    ).OrderByDescending(c => c.ActivityId).Select(c => new
+                    {
+                        user = c.user,
+                        ActivityCoverPhotos = c.ActivityCoverPhotos,
+                        ActivityId = c.ActivityId,
+                        Title = c.Title,
+                        LastEditedDate = c.LastEditedDate,
+                        Rating = c.rating
+                    }).ToList();
                 if (onlineact != null)
                 {
                     return Ok(new { message = "Successful", offline = "offline", activity = usractivity, userid= userid });

@@ -15,7 +15,6 @@
     <Folder Include="Customerprofile\" />
     <Folder Include="MyImages\" />
     <Folder Include="Organizationimages\" />
-    <Folder Include="wwwroot\" />
   </ItemGroup>
 
   <ItemGroup>
