@@ -117,47 +117,65 @@ namespace Core.Api.Controllers
         }
 
         [HttpPost]
-        [Authorize]
+        //[Authorize]
         [Route("EditProfile")]
-        public IActionResult EditProfile([FromBody]User customer)  //***
+        public IActionResult EditProfile([FromBody]User customer, string user_id)  //***
         {
             try
             {
-                 // var idd = int.Parse(customer.);
+                // var idd = int.Parse(customer.);GetUserId();
                 //string id, string user_name
-                var idd = GetUserId();
+                var idd = int.Parse(user_id);
+                var imgurlss = new List<string>();
+               
                 //var testid = 7;
                 var regcustomer = db.User.Find(idd);
                 if (regcustomer == null)
+                {
                     return Ok(new { status = 0, message = "Customer doesn't exist" });
-
-
-                if (customer.user_name != null)
-                    regcustomer.user_name = customer.user_name;
-                else if (customer.password != null)
-                    regcustomer.password = customer.password;
-                else if (customer.mail != null)
-                    regcustomer.mail = customer.mail;
-                else if (customer.gender != null)
-                    regcustomer.gender = customer.gender;
-
-                else if (customer.first_name != null || customer.last_name != null)
-                {
-                    regcustomer.first_name = customer.first_name;
-                    regcustomer.last_name = customer.last_name;
                 }
-                else if (customer.mobile != null)
-                    regcustomer.mobile = customer.mobile;
-                else if (customer.preferablePrice != null)
-                    regcustomer.preferablePrice = customer.preferablePrice;
-                else if (customer.customerphoto64 != null)
+                else if(regcustomer!=null)
                 {
-                    /*Upload customer image*/
+                    if (customer.user_name != null)
+                    {
+                        regcustomer.user_name = customer.user_name;
+                    }
+                    if (customer.password!=null)
+                    {
+                        regcustomer.password = customer.password;
+                    }
+                    if (customer.mail != null)
+                    {
+                        regcustomer.mail = customer.mail;
+                    }
+                    if (customer.gender!=null)
+                    {
+                        regcustomer.gender = customer.gender;
+                    }
+                    if (customer.first_name!=null)
+                    {
+                        regcustomer.first_name = customer.first_name;
+                    }
+                    if (customer.last_name!=null)
+                    {
+                        regcustomer.last_name = customer.last_name;
+                    }
+                    if (customer.mobile!=null)
+                    {
+                        regcustomer.mobile = customer.mobile;
+                    }
+                    if (customer.preferablePrice!=null)
+                    {
+                        regcustomer.preferablePrice = customer.preferablePrice;
+                    }
                     if (customer.customerphoto64 != null)
                     {
                         regcustomer.UserPhoto_Url = string.Concat(regcustomer.id.ToString(), "", ".png");
                         string FilePath = string.Concat(GetUserImage.ImagePathForUserPhoto, regcustomer.id.ToString(), ".png");
                         ImageSaveHelper.SaveImageToPath(customer.customerphoto64, regcustomer, "UserImages");
+                        var imageurl = $"{GetUserImage.OnlineImagePathForUserPhoto}{regcustomer.UserPhoto_Url}";
+                        imgurlss.Add(imageurl);
+                        db.SaveChanges();
                         //using (MemoryStream ms = new MemoryStream(Convert.FromBase64String(customer.customerphoto64)))
                         //{
                         //    using (Bitmap bm2 = new Bitmap(ms))
@@ -165,22 +183,18 @@ namespace Core.Api.Controllers
                         //        bm2.Save(FilePath);
                         //    }
                         //}
+                        if (imgurlss!=null)
+                        {
+                            return Ok(new { status = 1, message = "Customer information updated successfully", imageurl = imgurlss.FirstOrDefault() });
+                        }
+                        return Ok(new { status = 1, message = "Customer information updated successfully", imageurl = imgurlss.FirstOrDefault() });
                     }
-
-
-                }
-                else if (customer.DOB != null && !customer.DOB.ToShortDateString().Equals("01/01/0001"))
+                    return Ok(new { status = -1, message = "Failed to update customer information." });
+                               }
+                else
                 {
-                    try
-                    {
-                        regcustomer.DOB = customer.DOB;
-                    }
-                    catch (Exception) { }
+                    return Ok(new { status = -1, message = "Failed to update customer information." });
                 }
-
-                db.SaveChanges();
-
-                return Ok(new { status = 1, message = "Customer information updated successfully" });
             }
             catch (Exception)
             {
@@ -767,6 +781,8 @@ namespace Core.Api.Controllers
                 x.expiry_date,
                 x.identification_type,
                 x.Nationalities.nationality_id,
+                x.DOB,
+                x.gender,
                 id_copy = Path.Combine(GetUserImage.OnlineImagePathForUserPhoto + x.id_copy)
             }).ToList();
 
