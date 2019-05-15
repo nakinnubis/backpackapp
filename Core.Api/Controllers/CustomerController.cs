@@ -117,89 +117,84 @@ namespace Core.Api.Controllers
         }
 
         [HttpPost]
-        //[Authorize]
+        [Authorize]
         [Route("EditProfile")]
         public IActionResult EditProfile([FromBody]User customer, string user_id)  //***
         {
-            try
+            //try
+            //{
+            // var idd = int.Parse(customer.);GetUserId();
+            //string id, string user_name
+            var idd = int.Parse(user_id);
+            var imgurlss = new List<string>();
+
+            //var testid = 7;
+            var regcustomer = db.User.Find(idd);
+            if (regcustomer == null) return Ok(new { status = 0, message = "Customer doesn't exist" });
+            if (customer.user_name != null)
             {
-                // var idd = int.Parse(customer.);GetUserId();
-                //string id, string user_name
-                var idd = int.Parse(user_id);
-                var imgurlss = new List<string>();
-               
-                //var testid = 7;
-                var regcustomer = db.User.Find(idd);
-                if (regcustomer == null)
-                {
-                    return Ok(new { status = 0, message = "Customer doesn't exist" });
-                }
-                else if(regcustomer!=null)
-                {
-                    if (customer.user_name != null)
-                    {
-                        regcustomer.user_name = customer.user_name;
-                    }
-                    if (customer.password!=null)
-                    {
-                        regcustomer.password = customer.password;
-                    }
-                    if (customer.mail != null)
-                    {
-                        regcustomer.mail = customer.mail;
-                    }
-                    if (customer.gender!=null)
-                    {
-                        regcustomer.gender = customer.gender;
-                    }
-                    if (customer.first_name!=null)
-                    {
-                        regcustomer.first_name = customer.first_name;
-                    }
-                    if (customer.last_name!=null)
-                    {
-                        regcustomer.last_name = customer.last_name;
-                    }
-                    if (customer.mobile!=null)
-                    {
-                        regcustomer.mobile = customer.mobile;
-                    }
-                    if (customer.preferablePrice!=null)
-                    {
-                        regcustomer.preferablePrice = customer.preferablePrice;
-                    }
-                    if (customer.customerphoto64 != null)
-                    {
-                        regcustomer.UserPhoto_Url = string.Concat(regcustomer.id.ToString(), "", ".png");
-                        string FilePath = string.Concat(GetUserImage.ImagePathForUserPhoto, regcustomer.id.ToString(), ".png");
-                        ImageSaveHelper.SaveImageToPath(customer.customerphoto64, regcustomer, "UserImages");
-                        var imageurl = $"{GetUserImage.OnlineImagePathForUserPhoto}{regcustomer.UserPhoto_Url}";
-                        imgurlss.Add(imageurl);
-                        db.SaveChanges();
-                        //using (MemoryStream ms = new MemoryStream(Convert.FromBase64String(customer.customerphoto64)))
-                        //{
-                        //    using (Bitmap bm2 = new Bitmap(ms))
-                        //    {
-                        //        bm2.Save(FilePath);
-                        //    }
-                        //}
-                        if (imgurlss!=null)
-                        {
-                            return Ok(new { status = 1, message = "Customer information updated successfully", imageurl = imgurlss.FirstOrDefault() });
-                        }
-                        return Ok(new { status = 1, message = "Customer information updated successfully", imageurl = imgurlss.FirstOrDefault() });
-                    }
-                    return Ok(new { status = -1, message = "Failed to update customer information." });
-                               }
-                else
-                {
-                    return Ok(new { status = -1, message = "Failed to update customer information." });
-                }
+                regcustomer.user_name = customer.user_name;
+                db.SaveChanges();
             }
-            catch (Exception)
+            if (customer.password != null)
             {
-                return Ok(new { status = -1, message = "Failed to update customer information." });
+                regcustomer.password = customer.password;
+                db.SaveChanges();
             }
+            if (customer.mail != null)
+            {
+                regcustomer.mail = customer.mail;
+                db.SaveChanges();
+            }
+            if (customer.gender != null)
+            {
+                regcustomer.gender = customer.gender;
+                db.SaveChanges();
+            }
+            if (customer.first_name != null)
+            {
+                regcustomer.first_name = customer.first_name;
+                db.SaveChanges();
+            }
+            if (customer.last_name != null)
+            {
+                regcustomer.last_name = customer.last_name;
+                db.SaveChanges();
+            }
+            if (customer.bio != null)
+            {
+                regcustomer.bio = customer.bio;
+                db.SaveChanges();
+            }
+            if (customer.mobile != null)
+            {
+                regcustomer.mobile = customer.mobile;
+                db.SaveChanges();
+            }
+            if (customer.preferablePrice != null)
+            {
+                regcustomer.preferablePrice = customer.preferablePrice;
+                db.SaveChanges();
+            }
+            if (customer.customerphoto64 != null)
+            {
+                regcustomer.UserPhoto_Url = string.Concat(regcustomer.id.ToString(), "", ".png");
+                string FilePath = string.Concat(GetUserImage.ImagePathForUserPhoto, regcustomer.id.ToString(), ".png");
+                ImageSaveHelper.SaveImageToPath(customer.customerphoto64, regcustomer, "UserImages");
+                var imageurl = $"{GetUserImage.OnlineImagePathForUserPhoto}{regcustomer.UserPhoto_Url}";
+                imgurlss.Add(imageurl);
+                db.SaveChanges();
+            }
+            if(imgurlss.Count==0) return Ok(new { status = 1, message = "Customer information updated successfully", imageurl = $"{GetUserImage.OnlineImagePathForUserPhoto}{regcustomer.UserPhoto_Url}" });
+            return Ok(new { status = 1, message = "Customer information updated successfully", imageurl = imgurlss.FirstOrDefault() });
+
+            // 
+
+            //}
+            //catch (Exception)
+            //{
+            //    return Ok(new { status = -1, message = "Failed to update customer information." });
+            //}
         }
 
         [HttpPost]
@@ -280,9 +275,10 @@ namespace Core.Api.Controllers
             if (activities == null)
                 return Ok(new { status = 0, message = "Sorry, you don't have favorite activities" });
 
-            var favactivities = db.User_Favorite_Activities.Join(db.Activity.Where(x=> x.status == true & x.isCompleted == true)/*.Include(x => x.ActivityType).Include(x => x.Activity_Photos).Where(x => x.isdeleted == false)*/, fa => fa.activity_id,
+            var favactivities = db.User_Favorite_Activities.Join(db.Activity.Where(x => x.status == true & x.isCompleted == true)/*.Include(x => x.ActivityType).Include(x => x.Activity_Photos).Where(x => x.isdeleted == false)*/, fa => fa.activity_id,
                 a => a.id, (fa, a) => new { fa, a }).Where(c => c.fa.user_id == customerid)
-                .Select(c => new {
+                .Select(c => new
+                {
                     id = c.a.id,
                     title = c.a.title,
                     activity_Location = c.a.activity_Location,
@@ -297,7 +293,7 @@ namespace Core.Api.Controllers
                         url = Path.Combine(GetUserImage.OnlineImagePathForActivityTypePhoto + c.a.ActivityType.url)
                     },
                     Activity_Photos = c.a.Activity_Photos.Where(s => s.cover_photo == true).Select(s => s.url).FirstOrDefault() == null ? "NA" :
-                                               c.a.Activity_Photos.Where(s => s.cover_photo == true).Select(s => GetUserImage.OnlineImagePathForActivity+s.url).First(),
+                                               c.a.Activity_Photos.Where(s => s.cover_photo == true).Select(s => GetUserImage.OnlineImagePathForActivity + s.url).First(),
                 });
             //.OrderByDescending(c => c.additiondate);//.Take(1);
             if (favactivities != null)
@@ -305,7 +301,7 @@ namespace Core.Api.Controllers
             else
                 return NoContent();
         }
-     
+
         [Route("CustomerActivitiesDetails")]
         [HttpGet]
         public IActionResult CustomerActivitiesDetails(int activityId)
@@ -313,14 +309,15 @@ namespace Core.Api.Controllers
             var userid = HttpContext.User.FindFirst("userId") != null ? GetUserId() : -1;
 
             var activityDetails = db.Activity.Include(x => x.Individual_Categories).Include(x => x.Activity_Photos).Where(x => x.id == activityId)
-             .Select(x => new {
+             .Select(x => new
+             {
                  id = x.id,
                  title = x.title,
                  Category = new ActivityTypemodel
                  {
                      Id = x.ActivityType.id,
                      Name = x.ActivityType.Name,
-                     url = Path.Combine(GetUserImage.OnlineImagePathForActivityTypePhoto+x.ActivityType.url)
+                     url = Path.Combine(GetUserImage.OnlineImagePathForActivityTypePhoto + x.ActivityType.url)
                  },
                  description = x.description,
                  activity_Location = x.activity_Location,
@@ -344,10 +341,10 @@ namespace Core.Api.Controllers
                  Activity_Photos = x.Activity_Photos.Select(s => new photomodel
                  {
                      id = s.id,
-                     url = Path.Combine(GetUserImage.OnlineImagePathForActivity+ s.url),
+                     url = Path.Combine(GetUserImage.OnlineImagePathForActivity + s.url),
                      cover_photo = s.cover_photo
                  }).ToList(),
-        
+
                  Activity_Option = x.Activity_Option.Select(s => new OptionModel
                  {
                      id = s.Option.id,
@@ -415,7 +412,7 @@ namespace Core.Api.Controllers
                      x.User.mail,
                      UserPhoto_Url = Path.Combine(GetUserImage.OnlineImagePathForUserPhoto + x.User.UserPhoto_Url)
                  },
-                 favActivity =(userid==-1)?false: db.User_Favorite_Activities.Where(s => s.activity_id == x.id & s.user_id == userid).Count() == 0 ? false : true,
+                 favActivity = (userid == -1) ? false : db.User_Favorite_Activities.Where(s => s.activity_id == x.id & s.user_id == userid).Count() == 0 ? false : true,
 
                  reviews = x.Reviews.Select(w => new
                  {
@@ -435,7 +432,8 @@ namespace Core.Api.Controllers
                      s.group_Price,
                      s.total_tickets,
                      s.isForGroup,
-                     Avaliability_Pricings = s.Avaliability_Pricings.Select(d => new {
+                     Avaliability_Pricings = s.Avaliability_Pricings.Select(d => new
+                     {
                          d.id,
                          d.price,
                          d.priceAfterDiscount,
@@ -451,7 +449,7 @@ namespace Core.Api.Controllers
         [HttpPost]
         public IActionResult ListHomeActivities([FromBody]SearchActivities search)
         {
-            var userid = HttpContext.User.FindFirst("userId") != null ? GetUserId() : -1; 
+            var userid = HttpContext.User.FindFirst("userId") != null ? GetUserId() : -1;
 
             var coord = new GeoCoordinate(search.MapLat, search.MapLng);
 
@@ -469,7 +467,7 @@ namespace Core.Api.Controllers
                               categoryId = x.ActivityType.id,
                               price = x.Individual_Categories.Select(s => s.price).FirstOrDefault(),
                               x.group_price,
-                              favActivity = (userid==-1)?false:(db.User_Favorite_Activities.Where(s => s.activity_id == x.id & s.user_id == userid).Count() == 0)? false : true,
+                              favActivity = (userid == -1) ? false : (db.User_Favorite_Activities.Where(s => s.activity_id == x.id & s.user_id == userid).Count() == 0) ? false : true,
                               x.activity_Lang,
                               x.activity_Lat
                           }).ToList().OrderBy(x => x.id).GroupBy(p => p.categoryId)
@@ -481,7 +479,7 @@ namespace Core.Api.Controllers
             }
             else
             {
-                var activities = db.Activity.Where(x=>x.activity_Lat==(decimal)coord.Latitude && x.activity_Lang== (decimal)coord.Longitude)
+                var activities = db.Activity.Where(x => x.activity_Lat == (decimal)coord.Latitude && x.activity_Lang == (decimal)coord.Longitude)
                           .Select(x => new
                           {
                               x.id,
@@ -502,15 +500,15 @@ namespace Core.Api.Controllers
                     return Ok(activities);
                 else
                     return NoContent();
-            }        
+            }
 
-         
+
         }
 
         //[HttpGet]
         [HttpPost]
         [Route("ShowMoreActivities")]
-        public IActionResult ShowMoreActivities([FromBody]SearchActivities search ,int categoryId)
+        public IActionResult ShowMoreActivities([FromBody]SearchActivities search, int categoryId)
         {
             var userid = HttpContext.User.FindFirst("userId") != null ? GetUserId() : -1;
 
@@ -538,19 +536,21 @@ namespace Core.Api.Controllers
                          x.activity_Lang,
                          x.activity_Lat
                      }).OrderBy(x => x.id).Skip(2).ToList();
-               
-              
-        
-         if (search.MapLat != 0.0 | search.MapLng != 0.0)
-            { return Ok(activities.Where(x => x.activity_Lang != null & x.activity_Lat != null)
-                .Where(x => new GeoCoordinate(Convert.ToDouble(x.activity_Lat),
-                                                          Convert.ToDouble(x.activity_Lang)).GetDistanceTo(coord) <= radiusInMeters)); }
-        
-          
+
+
+
+            if (search.MapLat != 0.0 | search.MapLng != 0.0)
+            {
+                return Ok(activities.Where(x => x.activity_Lang != null & x.activity_Lat != null)
+                  .Where(x => new GeoCoordinate(Convert.ToDouble(x.activity_Lat),
+                                                            Convert.ToDouble(x.activity_Lang)).GetDistanceTo(coord) <= radiusInMeters));
+            }
+
+
             return Ok(activities);
 
-           
-              
+
+
         }
 
         [HttpPost]
@@ -575,24 +575,24 @@ namespace Core.Api.Controllers
                               x.id,
                               x.title,
                               activityPhoto_Url = x.Activity_Photos.Where(s => s.cover_photo == true).Select(s => s.url).FirstOrDefault() == null ? "NA" :
-                                                  x.Activity_Photos.Where(s => s.cover_photo == true).Select(s =>GetUserImage.OnlineImagePathForActivity+ s.url).First(),
+                                                  x.Activity_Photos.Where(s => s.cover_photo == true).Select(s => GetUserImage.OnlineImagePathForActivity + s.url).First(),
                               reviewsCount = x.Reviews.Where(s => s.activity_id == x.id).Count(),
                               x.rate,
                               price = x.Individual_Categories.Select(s => s.price).FirstOrDefault(),
                               x.group_price,
-                              favActivity =(userid==-1)?false: db.User_Favorite_Activities.Where(s => s.activity_id == x.id & s.user_id == userid).Count() == 0 ? false : true,
+                              favActivity = (userid == -1) ? false : db.User_Favorite_Activities.Where(s => s.activity_id == x.id & s.user_id == userid).Count() == 0 ? false : true,
                               x.activity_Lang,
                               x.activity_Lat
                           });
             if (search.MapLat != 0.0 | search.MapLng != 0.0)
             {
-                return Ok( activites.Where(x => x.activity_Lang != null & x.activity_Lat != null)
+                return Ok(activites.Where(x => x.activity_Lang != null & x.activity_Lat != null)
                          .Where(x => new GeoCoordinate(Convert.ToDouble(x.activity_Lat),
-                                                      Convert.ToDouble(x.activity_Lang)).GetDistanceTo(coord) <= radiusInMeters)); 
+                                                      Convert.ToDouble(x.activity_Lang)).GetDistanceTo(coord) <= radiusInMeters));
             }
             return Ok(activites);
         }
-       
+
 
         [HttpGet]
         [Authorize]
@@ -600,10 +600,11 @@ namespace Core.Api.Controllers
         public IActionResult CustomerActivities()
         {
             int userid = GetUserId();
-        
+
             var FutureActivities = db.Booking_Ticket.Include(x => x.Booking).Include(x => x.Booking.Activity)
                                   .Where(x => x.userId == userid & x.Booking.Avaliability.activity_Start >= DateTime.Now)
-                                  .Select(x => new {
+                                  .Select(x => new
+                                  {
                                       x.Booking.Activity.id,
                                       x.Booking.Activity.title,
                                       x.Booking.Activity.description,
@@ -614,7 +615,7 @@ namespace Core.Api.Controllers
                                       x.Booking.Activity.meeting_Lat,
                                       x.Booking.Activity.meeting_Location,
                                       x.Booking.Avaliability.activity_Start,
-                                      activityPhoto_UrL = x.Booking.Activity.Activity_Photos.Where(s => s.cover_photo == true).Select(s =>GetUserImage.OnlineImagePathForActivity+ s.url).FirstOrDefault(),
+                                      activityPhoto_UrL = x.Booking.Activity.Activity_Photos.Where(s => s.cover_photo == true).Select(s => GetUserImage.OnlineImagePathForActivity + s.url).FirstOrDefault(),
                                       x.Booking.avaliability_id,
                                       x.ticket_id,
                                       price = x.Booking.Activity.Individual_Categories.Select(s => s.price).FirstOrDefault(),
@@ -632,7 +633,8 @@ namespace Core.Api.Controllers
                                   });
             var PastActivities = db.Booking_Ticket.Include(x => x.Booking).Include(x => x.Booking.Activity)
                                   .Where(x => x.userId == userid & x.Booking.Avaliability.activity_Start < DateTime.Now)
-                                  .Select(x => new {
+                                  .Select(x => new
+                                  {
                                       x.Booking.Activity.id,
                                       x.Booking.Activity.title,
                                       x.Booking.Activity.description,
@@ -643,7 +645,7 @@ namespace Core.Api.Controllers
                                       x.Booking.Activity.meeting_Lat,
                                       x.Booking.Activity.meeting_Location,
                                       x.Booking.Avaliability.activity_Start,
-                                      activityPhoto_Url = x.Booking.Activity.Activity_Photos.Where(s => s.cover_photo == true).Select(s =>GetUserImage.OnlineImagePathForActivity+ s.url).FirstOrDefault(),
+                                      activityPhoto_Url = x.Booking.Activity.Activity_Photos.Where(s => s.cover_photo == true).Select(s => GetUserImage.OnlineImagePathForActivity + s.url).FirstOrDefault(),
                                       x.Booking.avaliability_id,
                                       x.ticket_id,
                                       price = x.Booking.Activity.Individual_Categories.Select(s => s.price).FirstOrDefault(),
@@ -705,7 +707,7 @@ namespace Core.Api.Controllers
                                  Activity_Photos = x.Activity_Photos.Select(s => new photomodel
                                  {
                                      id = s.id,
-                                   //  url =Path.Combine(GetUserImage.OnlineImagePathForActivity + s.url),
+                                     //  url =Path.Combine(GetUserImage.OnlineImagePathForActivity + s.url),
                                      url = "http://backpackapis.wasltec.org/myimages/" + s.url,
                                      cover_photo = s.cover_photo
                                  }).ToList()
@@ -725,9 +727,9 @@ namespace Core.Api.Controllers
                                  Options = x.Activity_Option.Select(o => o.option_id.Value),
                                  x.activity_Lang,
                                  x.activity_Lat
-                               });
+                             });
 
-                                 var z = activities;
+            var z = activities;
 
             if (lstOptions.Count() != 0)
             {
@@ -811,7 +813,8 @@ namespace Core.Api.Controllers
 
             userIdentification.userId = GetUserId();
             /*Upload customer Id copy*/
-            try {
+            try
+            {
                 if (userIdentification.id_copy != null)
                 {
                     string FilePath = string.Concat(GetUserImage.ImagePathForUserPhoto, userIdentification.userId.ToString(), "_ID", ".png");

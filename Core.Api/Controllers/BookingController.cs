@@ -622,7 +622,7 @@ namespace Core.Api.Controllers
                  BookinfInfo = c.Activity.Bookings.Where(g => g.activity_id == activityid).AsEnumerable(),
                 individualCategories = c.Activity.Individual_Categories.Select(s => new IndividualCategoryModel
                 {
-                    id = s.id,
+                   
                     name = s.name,
                     capacity = s.capacity,
                     price = s.price,

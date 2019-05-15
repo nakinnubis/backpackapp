@@ -86,7 +86,7 @@ namespace Core.Web.Models
                 //#warning you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
                 //"Persist Security Info=False;server = db784191071.hosting-data.io; Initial Catalog = db784191071; User ID = dbo784191071;Password = Developer#123"
                 //"Server=dea5f48d-f5f9-4929-8e57-aa3000a3243f.sqlserver.sequelizer.com;Database=dbdea5f48df5f949298e57aa3000a3243f;User ID=oamekanmvwdglsae;Password=itqJhQN5bhxAFs6DeKQtWGBekxpUvjF4A7dSQuHZuGhqKe7E6MjXbPvHZkxRA2HZ;"
-                //"Server= PMSL-LAG-OP11\\SQLEXPRESS;Database=db781513661;Trusted_Connection=True;"
+                //"Server= DESKTOP-H39SEMJ\\SQLEXPRESS;Database=db784191071;Trusted_Connection=True;"
                 optionsBuilder.UseSqlServer("Persist Security Info=False;server = db784191071.hosting-data.io; Initial Catalog = db784191071; User ID = dbo784191071;Password = Developer#123");
 
 

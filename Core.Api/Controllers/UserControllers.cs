@@ -123,6 +123,7 @@ namespace Core.Api.Controllers
 
         [HttpGet]
         [Route("GetProfile")]
+        [Authorize]
         public IActionResult GetProfile(string user_id)  //*
 
         {
@@ -136,18 +137,19 @@ namespace Core.Api.Controllers
 
                 var user = db.User.Where(u => u.id == userid).Select(u => new
                 {
-                    u.id,
-                    u.first_name,
-                    u.last_name,
-                    u.mail,
-                    u.user_name,
-                    u.password,
-                    u.mobile,
+                   id= u.id,
+                  first_name = u.first_name,
+                   last_name= u.last_name,
+                  mail=  u.mail,
+                   user_name= u.user_name,
+                   password= u.password,
+                   mobile= u.mobile,
                     UserPhoto_Url = Path.Combine((u.UserPhoto_Url == null ? "NA" : GetUserImage.OnlineImagePathForUserPhoto + u.UserPhoto_Url)),
-                    u.user_Type,
-                    u.gender,
-                    u.DOB,
-                    u.preferablePrice
+                    user_Type=u.user_Type,
+                    gender=u.gender,
+                   DOB= u.DOB,
+                   bio=u.bio,
+                    preferablePrice=u.preferablePrice
                 });
 
                 if (user != null)
