@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Core.Api.Helper;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 
 namespace Core.Api.Models
@@ -45,6 +47,8 @@ namespace Core.Api.Models
         public string Activity_Option { get; set; }
         public  IEnumerable<Avaliabilitymodel> Avaliabilities { get; set; }
         public string Individual_Categories { get; set; }
+        public JObject Individual_Categories1 { get; set; }
+        public JObject Activity_Options { get; set; }
     }
 
     public class photomodel

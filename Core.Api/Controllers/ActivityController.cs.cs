@@ -13,6 +13,7 @@ using Core.Api.Models;
 using Core.Api.Helper;
 using Microsoft.AspNetCore.Cors;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace Core.Api.Controllers
 {
@@ -226,13 +227,14 @@ namespace Core.Api.Controllers
         [Authorize]
         public IActionResult GetActivityDetails(int activityid)
         {
+           // JavaScriptSerializer jss = new JavaScriptSerializer();
             var details = (from a in db.Activity.Include(x => x.Activity_Add_Ons)
                                             .Include(x => x.Activity_Photos).Include(x => x.ActivityType)
                                             .Include(x => x.Activity_Option).Include(x => x.Activity_Organizer)
                                             .Include(x => x.Avaliabilities)
                                             .Include(x => x.Individual_Categories)
                            where a.id == activityid & a.isdeleted == false
-                           select new ActivityModel
+                           select new 
                            {
                                id = a.id,
                                title = a.title,
@@ -248,7 +250,7 @@ namespace Core.Api.Controllers
                                has_individual_categories=a.has_individual_categories,
                                has_specific_capacity=a.has_specific_capacity,
                                capacityIsUnlimited = a.capacityIsUnlimited,
-                               time_option=db.Booking.Where(c=>c.activity_id==activityid).Select(c=>c.time_option).AsEnumerable(),
+                              // time_option=db.Booking.Where(c=>c.activity_id==activityid &&a.).Select(c=>c.time_option).AsEnumerable(),
                                Category = new ActivityTypemodel
                                {
                                    Id = a.ActivityType.id,
@@ -302,7 +304,7 @@ namespace Core.Api.Controllers
                                max_capacity_group = a.max_capacity_group,
                                group_price = a.group_price,
                                apply_discount = a.apply_discount,
-                               Individual_Categories = a.individual_categories,
+                               Individual_Categories = DeZerial(a.individual_categories),
                                Activity_Organizer = a.Activity_Organizer.Select(s => new OrganizerModel
                                {
                                    Id = s.id,
@@ -313,7 +315,7 @@ namespace Core.Api.Controllers
                                    OrganizerType = s.Organizer_Type.type,
                                    TypeDescription = s.Organizer_Type.description
                                }).ToList(),
-                               Activity_Option = a.activity_option
+                               Activity_Option = DeZerial(a.activity_option)
                            }).ToList();
 
 
@@ -322,7 +324,14 @@ namespace Core.Api.Controllers
             else
                 return NoContent();
         }
-
+        public dynamic DeZerial(string json)
+        {
+            if(json != null)
+            {
+               return JsonConvert.DeserializeObject(json);
+            }
+            return null;
+        }
         //To change activity status from online to offline and vice versa
         [Authorize]
         [Route("ChangeStatus")]
@@ -1353,7 +1362,7 @@ namespace Core.Api.Controllers
                     ActivityId = d.id,
                     Title = d.title,
                     LastEditedDate = d.modified_date ?? d.creation_date,
-                    rating = db.Reviews.Where(c => c.activity_id == d.id).AsEnumerable()
+                    rating = db.Reviews.Where(c => c.activity_id == d.id).Select(c=>c.rate).Average()
                 }
                     ).OrderByDescending(c => c.ActivityId).Select(c => new
                     {

@@ -464,6 +464,29 @@ namespace Core.Api.Controllers
             }
             return BadRequest(new { message = "Error occured or submission is invalid" });
         }
+        [HttpGet]
+        [Route("GetOrganizationInfo")]
+        public IActionResult GetOrganizationInfo(string userId)
+        {
+            var userid = int.Parse(userId);
+            var user = db.User.Find(userid);
+            var orgdata = db.User.FirstOrDefault(o => o.id == userid);
+            if(orgdata != null)
+            {
+                var organization = new OrganizerInfo
+                {
+                    Name = orgdata.organization_name,
+                    phone = orgdata.mobile,
+                    Email = orgdata.mail,
+                    About = orgdata.about_organization,
+                    Bio = orgdata.bio,
+                    Address = orgdata.address,
+                    base64Img = GetUserImage.OrganizationPhoto + Path.Combine($"{orgdata.UserPhoto_Url}"),
+                };
+                return Ok(new { message = "successful", organization = Newtonsoft.Json.JsonConvert.SerializeObject(organization) });
+            }
+            return Ok(new { message = "organization doesn't exist" });
+        }
 ///Sly just added this 6th of May 2019
        
         [HttpPost]
