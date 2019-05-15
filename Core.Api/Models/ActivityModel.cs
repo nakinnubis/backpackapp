@@ -34,7 +34,7 @@ namespace Core.Api.Models
         public int stepNumber { get; set; }
         public bool isCompleted { get; set; }
         public bool capacityIsUnlimited { get; set; }
-
+        public IEnumerable<string> time_option { get; set; }
 
 
         public ActivityTypemodel Category { get; set; }

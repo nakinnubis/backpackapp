@@ -248,6 +248,7 @@ namespace Core.Api.Controllers
                                has_individual_categories=a.has_individual_categories,
                                has_specific_capacity=a.has_specific_capacity,
                                capacityIsUnlimited = a.capacityIsUnlimited,
+                               time_option=db.Booking.Where(c=>c.activity_id==activityid).Select(c=>c.time_option).AsEnumerable(),
                                Category = new ActivityTypemodel
                                {
                                    Id = a.ActivityType.id,
@@ -287,7 +288,7 @@ namespace Core.Api.Controllers
                                status = a.status,
                                notice_in_advance = a.notice_in_advance,
                                booking_window = a.booking_window,
-                               Avaliabilities = a.Avaliabilities.Select(s => new Avaliabilitymodel
+                               Avaliabilities = db.Avaliability.Where(f=>f.activity_id==activityid).Select(s => new Avaliabilitymodel
                                {
                                    Id = s.id,
                                    activitystart = s.activity_Start,
@@ -1432,13 +1433,14 @@ namespace Core.Api.Controllers
             return Ok(new { message = "Successful but no activity matches", activityoptions = ""});
         }
 
-        [HttpPatch]
+        [HttpPost]
         [Route("EditActivity")]
-        [Authorize]
+      //  [Authorize]
         public IActionResult EditActivity([FromBody] GetActivityOption editActivity, string activityid)
         {
             int activity_id = int.Parse(activityid);
             int userid = GetUserId();
+           // var type_id= db.Option.Where(c=>c.name=)
             var activityoption = db.Activity_Option.Where(a => a.activity_id == activity_id && a.Activity.user_id == userid).Select(c=>c).ToList();          
             var listofactivityoptions = editActivity.Activity_Options;
             foreach (var options in listofactivityoptions)
@@ -1476,7 +1478,7 @@ namespace Core.Api.Controllers
         public void UpdateEditActivity(Activity_Options options, int activity_id)
         {
             var optid = int.Parse(options.option_id);
-            var data = db.Activity_Option.FirstOrDefault(d => d.id == options.activityoptionid);
+            var data = db.Activity_Option.FirstOrDefault(d => d.activity_id == activity_id && d.option_id==optid);
             if (data != null)
             {
                 data.activity_id = activity_id;

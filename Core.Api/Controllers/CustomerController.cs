@@ -117,15 +117,15 @@ namespace Core.Api.Controllers
         }
 
         [HttpPost]
-        [Authorize]
+        //[Authorize]
         [Route("EditProfile")]
-        public IActionResult EditProfile([FromBody]User customer)  //***
+        public IActionResult EditProfile([FromBody]User customer, string user_id)  //***
         {
             try
             {
-                 // var idd = int.Parse(customer.);
+                // var idd = int.Parse(customer.);GetUserId();
                 //string id, string user_name
-                var idd = GetUserId();
+                var idd = int.Parse(user_id);
                 var imgurlss = new List<string>();
                
                 //var testid = 7;
@@ -781,6 +781,8 @@ namespace Core.Api.Controllers
                 x.expiry_date,
                 x.identification_type,
                 x.Nationalities.nationality_id,
+                x.DOB,
+                x.gender,
                 id_copy = Path.Combine(GetUserImage.OnlineImagePathForUserPhoto + x.id_copy)
             }).ToList();
 
