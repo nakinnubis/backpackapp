@@ -435,7 +435,7 @@ namespace Core.Api.Controllers
         }
         ///Sly just added this 6th of May 2019
         [Route("UpdateOrganizerInfo")]
-        [HttpPatch]
+        [HttpPost]
         public async Task<IActionResult> UpdateOrganizationInfo([FromBody]OrganizerInfo organizerInfo,string userId)
         {
             if (organizerInfo != null)

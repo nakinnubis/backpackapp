@@ -42,9 +42,9 @@ namespace Core.Api.Models
         public IEnumerable<addonsmodel> Activity_Add_Ons { get; set; }
         public IEnumerable<RuleModel> Activity_Rules { get; set; }
         public IEnumerable<OrganizerModel> Activity_Organizer { get; set; }
-        public IEnumerable<OptionModel> Activity_Option { get; set; }
+        public string Activity_Option { get; set; }
         public  IEnumerable<Avaliabilitymodel> Avaliabilities { get; set; }
-        public IEnumerable<Individualmodel> Individual_Categories { get; set; }
+        public string Individual_Categories { get; set; }
     }
 
     public class photomodel

@@ -25,7 +25,7 @@ namespace Core.Api.Models
         public IEnumerable<Avaliability_Pricing> avalibilityPricingModels { get; set; }
         public  IEnumerable<Avaliability> avalibilityModels { get; set; }
         public AvalibilityModel avalibilityModel { get; set; }
-        public IEnumerable<IndividualCategory> individualCategories { get; set; }  //****   
+        //public IEnumerable<IndividualCategory> individualCategories { get; set; }  //****   
         public IEnumerable<Activity_Organizer> activity_Organizers { get; set; }
         
    

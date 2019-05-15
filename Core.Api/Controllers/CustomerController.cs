@@ -769,8 +769,7 @@ namespace Core.Api.Controllers
         [Route("getuseridverification")]
         public IActionResult getuseridverification()  //***
         {
-            int userid = GetUserId();
-            //int userid = 29;
+            int userid = GetUserId();          
             var regcustomer = db.User.Find(userid);
             if (regcustomer == null)
                 return Ok(new { status = 0, message = "Customer doesn't exist" });

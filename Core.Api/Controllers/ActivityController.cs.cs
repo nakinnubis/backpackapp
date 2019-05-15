@@ -302,14 +302,7 @@ namespace Core.Api.Controllers
                                max_capacity_group = a.max_capacity_group,
                                group_price = a.group_price,
                                apply_discount = a.apply_discount,
-                               Individual_Categories = a.Individual_Categories.Select(s => new Individualmodel
-                               {
-                                   Id = s.id,
-                                   name = s.name,
-                                   price = s.price,
-                                   priceafterdiscout = s.price_after_discount,
-                                   Capacity = s.capacity
-                               }),
+                               Individual_Categories = a.individual_categories,
                                Activity_Organizer = a.Activity_Organizer.Select(s => new OrganizerModel
                                {
                                    Id = s.id,
@@ -320,15 +313,7 @@ namespace Core.Api.Controllers
                                    OrganizerType = s.Organizer_Type.type,
                                    TypeDescription = s.Organizer_Type.description
                                }).ToList(),
-                               Activity_Option = a.Activity_Option.Select(s => new OptionModel
-                               {
-                                   id = s.Option.id,
-                                   name = s.Option.name,
-                                   fromAge = s.fromAge,
-                                   toAge = s.toAge,
-                                   icon = s.Option.icon,
-                                   description = s.Option.description,
-                               }).ToList()
+                               Activity_Option = a.activity_option
                            }).ToList();
 
 
@@ -1024,7 +1009,7 @@ namespace Core.Api.Controllers
        // [Authorize]
         [HttpPost]
         [Route("Create_ActivityLength")]
-        public IActionResult Create_ActivityLength([FromBody]BookingSettingModel bookingSettingModel, int activityId, int mode)
+        public IActionResult Create_ActivityLength([FromBody]BookingSettingModel bookingSettingModel, int activityId)
         {
             var activity = db.Activity.Find(activityId);
 
@@ -1041,39 +1026,41 @@ namespace Core.Api.Controllers
                 var json = Newtonsoft.Json.JsonConvert.SerializeObject(bookingSettingModel.individual_categories);
                 activity.modified_date = DateTime.Now.Date;
                 activity.individual_categories= json;
-                if (mode == 2)
-                {
-                    foreach (var individual in bookingSettingModel.individualCategories)
-                    {
-                        if (individual.id == 0)
-                        {
-                            individual.activityid = activity.id;
-                            db.Individual_Categories.Add(individual);
-                         
-                        }
-                        else
-                        {
-                            var old_individual = db.Individual_Categories.Find(individual.id);
-                            if (old_individual == null)
-                                return BadRequest();
-                            old_individual.capacity = individual.capacity;
-                        }
-                       
-                    }
-                    db.SaveChanges();
-                    return Ok(new { message = "activity length created successfully", activityId = activity.id, IndividualCategories = activity.individual_categories });
-                }
-                if (mode == 1)
-                {
-                    foreach (var individual in bookingSettingModel.individualCategories)
-                    {
-                        individual.activityid = activity.id;
-                        db.Individual_Categories.Add(individual);
-                    }
-                    activity.stepNumber = 8;   // 8 (Create Capacity & Length)
-                    db.SaveChanges();
-                    return Ok(new { message = "activity length created successfully", activityId = activity.id,IndividualCategories =activity.individual_categories});
-                }
+                db.SaveChanges();
+                return Ok(new { message = "activity length created successfully", activityId = activity.id, IndividualCategories = activity.individual_categories });
+                //if (mode == 2)
+                //{
+                //    foreach (var individual in bookingSettingModel.individualCategories)
+                //    {
+                //        if (individual.id == 0)
+                //        {
+                //            individual.activityid = activity.id;
+                //            db.Individual_Categories.Add(individual);
+
+                //        }
+                //        else
+                //        {
+                //            var old_individual = db.Individual_Categories.Find(individual.id);
+                //            if (old_individual == null)
+                //                return BadRequest();
+                //            old_individual.capacity = individual.capacity;
+                //        }
+
+                //    }
+                //    db.SaveChanges();
+
+                //}
+                //if (mode == 1)
+                //{
+                //    foreach (var individual in bookingSettingModel.individualCategories)
+                //    {
+                //        individual.activityid = activity.id;
+                //        db.Individual_Categories.Add(individual);
+                //    }
+                //    activity.stepNumber = 8;   // 8 (Create Capacity & Length)
+                //    db.SaveChanges();
+                //    return Ok(new { message = "activity length created successfully", activityId = activity.id,IndividualCategories =activity.individual_categories});
+                //}
                 //var individualCategories = db.Individual_Categories.Where(x => x.activityid == activity.id).Select(x => new { x.id, x.name, x.capacity, x.price });
                 //return Ok(new { activityId = activity.id, IndividualCategories = individualCategories });
             }
@@ -1093,25 +1080,29 @@ namespace Core.Api.Controllers
                 activity.group_price = bookingSettingModel.group_price;
                 activity.apply_discount = bookingSettingModel.apply_discount;
                 activity.price_discount = bookingSettingModel.price_discount;
+                var json = Newtonsoft.Json.JsonConvert.SerializeObject(bookingSettingModel.individual_categories);
+                activity.modified_date = DateTime.Now.Date;
+                activity.individual_categories = json;
+                db.SaveChanges();
+                return Ok(new { activityId = activity.id, individual_categories = json });
+                //foreach (var individual in bookingSettingModel.individualCategories)
+                //{
+                //    var oldIndividual = db.Individual_Categories.Find(individual.id);
+                //    if (oldIndividual == null)
+                //        return BadRequest();
+                //    oldIndividual.price = individual.price;
+                //    oldIndividual.price_after_discount = individual.price_after_discount;
 
-                foreach (var individual in bookingSettingModel.individualCategories)
-                {
-                    var oldIndividual = db.Individual_Categories.Find(individual.id);
-                    if (oldIndividual == null)
-                        return BadRequest();
-                    oldIndividual.price = individual.price;
-                    oldIndividual.price_after_discount = individual.price_after_discount;
+                //    db.SaveChanges();
+                //}
+                //if (mode == 1)
+                //{
+                //    activity.stepNumber = 9;   // 9 (Create Pricing & Payment)
+                //    db.SaveChanges();
+                //}
 
-                    db.SaveChanges();
-                }
-                if (mode == 1)
-                {
-                    activity.stepNumber = 9;   // 9 (Create Pricing & Payment)
-                    db.SaveChanges();
-                }
-
-                var individualCategories = db.Individual_Categories.Where(x => x.activityid == activity.id).Select(x => new { x.id, x.name, x.capacity, x.price });
-                return Ok(new { activityId = activity.id, IndividualCategories = individualCategories });
+                //var individualCategories = db.Individual_Categories.Where(x => x.activityid == activity.id).Select(x => new { x.id, x.name, x.capacity, x.price });
+               
             }
             return BadRequest();
         }
@@ -1438,17 +1429,22 @@ namespace Core.Api.Controllers
       //  [Authorize]
         public IActionResult EditActivity([FromBody] GetActivityOption editActivity, string activityid)
         {
-            int activity_id = int.Parse(activityid);
-            int userid = GetUserId();
-           // var type_id= db.Option.Where(c=>c.name=)
-            var activityoption = db.Activity_Option.Where(a => a.activity_id == activity_id && a.Activity.user_id == userid).Select(c=>c).ToList();          
-            var listofactivityoptions = editActivity.Activity_Options;
-            foreach (var options in listofactivityoptions)
-            {
-                UpdateEditActivity(options, activity_id);
-            }
+           
+            //foreach (var options in listofactivityoptions)
+            //{
+            //    UpdateEditActivity(options, activity_id, actcount);
+            //}
+  int activity_id = int.Parse(activityid);
             try
             {
+              
+                int userid = GetUserId();
+                // var type_id= db.Option.Where(c=>c.name=)
+                var activityoption = db.Activity.Where(a => a.id == activity_id && a.user_id == userid).FirstOrDefault();
+                var listofactivityoptions = editActivity.Activity_Options;
+                var json = Newtonsoft.Json.JsonConvert.SerializeObject(listofactivityoptions);
+                activityoption.modified_date = DateTime.Now.Date;
+                activityoption.activity_option = json;
                 var updateactvitytable = db.Activity.Where(c => c.id == activity_id).FirstOrDefault();
                 updateactvitytable.title = editActivity.title;
                 updateactvitytable.description = editActivity.description;
@@ -1475,32 +1471,33 @@ namespace Core.Api.Controllers
         {
 
         }
-        public void UpdateEditActivity(Activity_Options options, int activity_id)
-        {
-            var optid = int.Parse(options.option_id);
-            var data = db.Activity_Option.FirstOrDefault(d => d.activity_id == activity_id && d.option_id==optid);
-            if (data != null)
-            {
-                data.activity_id = activity_id;
-               data.option_id = optid;
-               data.fromAge = options.fromAge;
-               data.toAge = options.toAge;
-                db.SaveChanges();
-            }
-            else
-            {
-                var newoptionadd = new Activity_Option
-                {
-                    activity_id = activity_id,
-                    option_id = int.Parse(options.option_id),
-                    fromAge = options.fromAge,
-                    toAge = options.toAge
-                };
-                db.Activity_Option.Add(newoptionadd);
-                db.SaveChanges();
-            }
+        //public void UpdateEditActivity(Activity_Options options, int activity_id, int counts)
+        //{
+        //    var optid = int.Parse(options.option_id);
+        //    var data = db.Activity_Option.Where(d => d.activity_id == activity_id).ElementAt(counts);
+        //    if (data != null)
+        //    {
+                
+        //       data.activity_id = activity_id;
+        //       data.option_id = optid;
+        //       data.fromAge = options.fromAge;
+        //       data.toAge = options.toAge;
+        //        db.SaveChanges();
+        //    }
+        //    //else
+        //    //{
+        //    //    var newoptionadd = new Activity_Option
+        //    //    {
+        //    //        activity_id = activity_id,
+        //    //        option_id = int.Parse(options.option_id),
+        //    //        fromAge = options.fromAge,
+        //    //        toAge = options.toAge
+        //    //    };
+        //    //    db.Activity_Option.Add(newoptionadd);
+        //    //    db.SaveChanges();
+        //    //}
            
-        }
+        //}
 
     }
 

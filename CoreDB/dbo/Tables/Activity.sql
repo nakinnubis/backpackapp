@@ -34,6 +34,7 @@
     [has_individual_categories] BIT NULL DEFAULT ((0)), 
     [individual_categories] NVARCHAR(MAX) NULL, 
     [modified_date] DATE NULL, 
+    [activity_option] NVARCHAR(MAX) NULL, 
     CONSTRAINT [PK_Activity] PRIMARY KEY CLUSTERED ([id] ASC),
     CONSTRAINT [FK_Activity_ActivityType_type_id] FOREIGN KEY ([type_id]) REFERENCES [dbo].[ActivityType] ([id]) ON DELETE SET NULL ON UPDATE SET NULL,
     CONSTRAINT [FK_Activity_User_user_id] FOREIGN KEY ([user_id]) REFERENCES [dbo].[User] ([id])	 

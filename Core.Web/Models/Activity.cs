@@ -91,7 +91,7 @@ namespace Core.Web.Models
         public virtual ICollection<IndividualCategory> Individual_Categories { get; set; }
         public string individual_categories { get; set; }
         public DateTime? modified_date { get; set; }
-
+        public string activity_option { get; set; }
 
 
 
