@@ -104,6 +104,7 @@ namespace Core.Api.Controllers
         [Authorize]
         public IActionResult GetAllActivities()  //offline&online&incomplete 
         {
+            
             var activities =
               db.Activity.Include(x => x.ActivityType).Include(x => x.Activity_Photos)
                      .Where(x => x.isdeleted == false && x.user_id == GetUserId()).ToList()
@@ -129,12 +130,12 @@ namespace Core.Api.Controllers
                                    cover_photo = s.cover_photo
                                }).ToList(),
                            }).ToList();
-
-            var OfflineActivities =activities.Where(x=>x.status==false & x.isCompleted == true).ToList();
-            var OnlinneActivites= activities.Where(x => x.status == true & x.isCompleted == true).ToList();
+            //i remove & 
+            var OfflineActivities =activities.Where(x=>x.status==false || x.isCompleted == true).ToList();
+            var OnlinneActivites= activities.Where(x => x.status || x.isCompleted == false).ToList();
             var IncompleteActivites= activities.Where(x =>  x.isCompleted == false).ToList();
             if (activities != null)
-            return Ok( new { OnlinneActivites,OfflineActivities, IncompleteActivites } );
+            return Ok( new { OnlinneActivites,OfflineActivities, IncompleteActivites , all=activities } );
             else
                 return NoContent();
         }
@@ -946,44 +947,57 @@ namespace Core.Api.Controllers
                     List<int> nonUpdated_ids = new List<int>();
                     foreach (var aval in bookingSettingModel.avalibilityModels)
                     {
-                        var startday= aval.activity_Start.Value.DayOfWeek;
-                        var endday = aval.activity_End.Value.DayOfWeek;
-                        if (startday.ToString()==aval.startdate && endday.ToString()==aval.enddate)
+                        //var startday= aval.activity_Start.Value.DayOfWeek;
+                        //var endday = aval.activity_End.Value.DayOfWeek;
+
+                        var reservation = db.Booking.Where(x => x.avaliability_id == aval.id).Select(x => x.id).ToList();
+                        if (reservation.Count != 0)
                         {
-                            if (aval.id == 0)
-                            {//i need to prob this part further                            
-                                aval.total_tickets = 0;
-                                aval.activity_id = activity.id;
-                                db.Avaliability.Add(aval);
-                                db.SaveChanges();
-                            }
-                            else
-                            {
-                                var reservation = db.Booking.Where(x => x.avaliability_id == aval.id).Select(x => x.id).ToList();
-                                if (reservation.Count != 0)
-                                {
-                                    nonUpdated_ids.Add(aval.id);
-                                }
-                                else
-                                {
-                                    var availbility = db.Avaliability.Find(aval.id);
-                                    //now Abiola i need to ensure i change the day of the week part of aval.activity_start to the day sent by Ebuka
-                                    //same for end date
-                                    availbility.activity_Start = aval.activity_Start;
-                                    availbility.activity_End = aval.activity_End;
-                                    availbility.enddate = aval.enddate;
-                                    availbility.startdate = aval.startdate;
-                                    //I disable this temporarily based on ebuka and monsur request
-                                    // availbility.group_Price = aval.group_Price;
-                                    db.SaveChanges();
-                                }
-                            }
+                            nonUpdated_ids.Add(aval.id);
                         }
                         else
                         {
-                            return Ok(new { message = "Failed. The Day of the week for the date selected, start day and end day do not match ", availability_ids = nonUpdated_ids });
+                            //var availbility = db.Avaliability.Find(aval.id);
+                            //now Abiola i need to ensure i change the day of the week part of aval.activity_start to the day sent by Ebuka
+                            //same for end date
+                            var availability = new Core.Web.Models.Avaliability
+                            {
+                               activity_Start = aval.activity_Start.Value.Date,
+                               activity_End = aval.activity_End.Value.Date,
+                               enddate = aval.enddate,
+                               startdate = aval.startdate,
+                               starthour = aval.starthour,
+                               endhour = aval.endhour,
+                            };
+                            if(availability != null)
+                            {
+                                db.Avaliability.Add(availability);
+                                //I disable this temporarily based on ebuka and monsur request
+                                // availbility.group_Price = aval.group_Price;
+                                db.SaveChanges();
+                            }
+                            
                         }
-                      
+                        if (aval.id == 0)
+                        {//i need to prob this part further                            
+                            aval.total_tickets = 0;
+                            aval.activity_id = activity.id;
+                            db.Avaliability.Add(aval);
+                            db.SaveChanges();
+                        }
+                        //else
+                        //{
+                           
+                        //}
+                        //if (startday.ToString()==aval.startdate && endday.ToString()==aval.enddate)
+                        //{
+
+                        //}
+                        //else
+                        //{
+                        //    return Ok(new { message = "Failed. The Day of the week for the date selected, start day and end day do not match ", availability_ids = nonUpdated_ids });
+                        //}
+
                     }
                     if (nonUpdated_ids.Count != 0)
                         return Ok(new { message = " There are some availability that cannot be modified because they have reservations ", availability_ids = nonUpdated_ids });
@@ -996,13 +1010,18 @@ namespace Core.Api.Controllers
                     {
                         var startday = aval.activity_Start.Value.DayOfWeek;
                         var endday = aval.activity_End.Value.DayOfWeek;
-                        if (startday.ToString() == aval.startdate && endday.ToString() == aval.enddate)
-                        {
-                            aval.total_tickets = 0;
-                            aval.activity_id = activity.id;
+                        //if (startday.ToString() == aval.startdate && endday.ToString() == aval.enddate)
+                        //{
 
-                            db.Avaliability.Add(aval);
-                        }
+                        //}
+                        aval.total_tickets = 0;
+                        aval.activity_id = activity.id;
+
+                        db.Avaliability.Add(aval);
+                        //availbility.enddate = aval.enddate;
+                        //availbility.startdate = aval.startdate;
+                        //availbility.starthour = aval.starthour;
+                        //availbility.endhour = aval.endhour;
                     }
 
                     activity.stepNumber = 7;      // 7 (Create Availabilty)
@@ -1349,7 +1368,7 @@ namespace Core.Api.Controllers
 
                 ///  var onlineactivity =await .ToListAsync();
 
-                var onlineact = db.Activity.Where(c => c.user_id == userid && !c.isCompleted).ToList();
+                var onlineact = db.Activity.Where(c => c.user_id == userid && !c.status|| !c.isCompleted).ToList();
                 var usractivity = onlineact.Select(d => new
                 {
                     ActivityCoverPhotos = db.Activity_Photos.Where(c => c.activity_id == d.id).Select(f => new
@@ -1362,7 +1381,9 @@ namespace Core.Api.Controllers
                     ActivityId = d.id,
                     Title = d.title,
                     LastEditedDate = d.modified_date ?? d.creation_date,
-                    rating = db.Reviews.Where(c => c.activity_id == d.id).Select(c=>c.rate).Average()
+                    isCompleted=d.isCompleted,
+                    status=d.status,
+                    rate = db.Reviews.Where(c => c.activity_id == d.id).Select(c=>c.rate).Average()
                 }
                     ).OrderByDescending(c => c.ActivityId).Select(c => new
                     {
@@ -1371,7 +1392,9 @@ namespace Core.Api.Controllers
                         ActivityId = c.ActivityId,
                         Title = c.Title,
                         LastEditedDate = c.LastEditedDate,
-                        Rating=c.rating
+                        isCompleted=c.isCompleted,
+                        status=c.status,
+                        Rate=c.rate??0
                     }).ToList();
                 if (onlineact != null)
                 {
@@ -1381,7 +1404,7 @@ namespace Core.Api.Controllers
             else if(isCompleted==true)
             {
 
-                var onlineact = db.Activity.Where(c => c.user_id == userid &&c.isCompleted).ToList();
+                var onlineact = db.Activity.Where(c => c.user_id == userid &&c.status||c.isCompleted).ToList();
                    var usractivity = onlineact.Select(d => new 
                      {
                          ActivityCoverPhotos = db.Activity_Photos.Where(c => c.activity_id == d.id).Select(f => new 
@@ -1394,7 +1417,7 @@ namespace Core.Api.Controllers
                          ActivityId = d.id,
                          Title = d.title,
                          LastEditedDate = d.modified_date ?? d.creation_date,
-                      rating = db.Reviews.Where(c=>c.activity_id==d.id).AsEnumerable()
+                      rate = db.Reviews.Where(c => c.activity_id == d.id).Select(c => c.rate).Average()
                    }
                     ).OrderByDescending(c => c.ActivityId).Select(c => new
                     {
@@ -1403,7 +1426,7 @@ namespace Core.Api.Controllers
                         ActivityId = c.ActivityId,
                         Title = c.Title,
                         LastEditedDate = c.LastEditedDate,
-                        Rating = c.rating
+                        Rate = c.rate
                     }).ToList();
                 if (onlineact != null)
                 {

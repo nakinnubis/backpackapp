@@ -51,7 +51,7 @@ namespace Core.Api.Helper
             get
             {
                 //change to current hosted url
-                return "http://petroquestdata.com/" + ImagePathForUserPhoto;// +"/";
+                return "http://197.253.22.241:8002/" + ImagePathForUserPhoto;// +"/";
             }
         }
         public static string OrganizationPhoto
@@ -59,7 +59,7 @@ namespace Core.Api.Helper
             get
             {
                 //change to current hosted url
-                return "http://petroquestdata.com/" + Org;// +"/";
+                return "http://197.253.22.241:8002/" + Org;// +"/";
             }
         }
         public static string OnlineImagePathForActivityTypePhoto
@@ -67,14 +67,14 @@ namespace Core.Api.Helper
             get
             {
                 //return Startup._hostingEnvironment.ContentRootPath + ImagePathForActivityTypePhoto;// +"/";
-                return "http://petroquestdata.com/" + ImagePathForActivityTypePhoto;// +"/";
+                return "http://197.253.22.241:8002/" + ImagePathForActivityTypePhoto;// +"/";
             }
         }
         public static string OnlineImagePathForActivity
         {
             get
             {
-                return "http://petroquestdata.com/" + ImagePathForActivity;// +"/";
+                return "http://197.253.22.241:8002/" + ImagePathForActivity;// +"/";
             }
         }
 
