@@ -17,7 +17,8 @@ namespace Core.Api.Controllers
     [Produces("application/json")]
     [Route("api/User")]
     [ApiController]
-    [EnableCors("AllowOrigin")]
+   [EnableCors("AllowOrigin")]
+   // [EnableCors("CorsPolicy")]
     //[Authorize]
     public class UserController : BaseController
     {
@@ -483,7 +484,7 @@ namespace Core.Api.Controllers
                     Address = orgdata.address,
                     base64Img = GetUserImage.OrganizationPhoto + Path.Combine($"{orgdata.UserPhoto_Url}"),
                 };
-                return Ok(new { message = "successful", organization = Newtonsoft.Json.JsonConvert.SerializeObject(organization) });
+                return Ok(new { message = "successful", organization = organization });
             }
             return Ok(new { message = "organization doesn't exist" });
         }

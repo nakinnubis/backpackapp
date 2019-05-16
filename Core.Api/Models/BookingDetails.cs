@@ -210,4 +210,29 @@ namespace Core.Api.Models
 
     }
 
+    public class CalendarApi
+    {
+
+        //  public bool full_group { get; set; }
+
+        public int? avaliabilityid { get; set; }
+        public DateTime? activity_Start { get; set; }
+        public DateTime? activity_End { get; set; }
+      
+        public IEnumerable<System.Linq.IGrouping<DateTime, Booking>> BookinfInfo { get; set; }
+        public IEnumerable<IndividualCategoryModel> individualCategories { get; set; }
+
+        //public IEnumerable<Booking_Ticket> BookingTickets { get; set; }
+        //  public decimal Activity_group_price { get; set; }
+        //public IEnumerable<Avaliability> avaliabilities{get;set; }
+        // return 1 in case of group, 0 for individual
+        public Nullable<int> isForGroup { get; set; }
+        public Nullable<int> total_tickets { get; set; }
+        public Nullable<decimal> Availability_group_Price { get; set; }
+        public Nullable<int> totalCapacity { get; set; }
+        public IEnumerable<AvaliabilityPricing> avaliabilityPricing { get; set; }
+        // public IEnumerable<IndividualCategoryModel> individualCategories { get; set; }
+
+    }
+
 }

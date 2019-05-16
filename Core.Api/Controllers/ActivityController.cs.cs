@@ -296,7 +296,11 @@ namespace Core.Api.Controllers
                                    Id = s.id,
                                    activitystart = s.activity_Start,
                                    actvityEnd = s.activity_End,
-                                   isForGroup = s.isForGroup
+                                   isForGroup = s.isForGroup,
+                                   startdate=s.startdate,
+                                   enddate=s.enddate,
+                                   starthour=s.starthour,
+                                   endhour=s.endhour
                                    //isprovider = s.isForGroup
                                }).ToList(),
                                Activity_length = a.Activity_length,
@@ -932,52 +936,24 @@ namespace Core.Api.Controllers
 
 
         //(Request 7)
-        [Authorize]
+       [Authorize]
         [HttpPost]
         [Route("Create_ActivityAvailabilty")]  //Eman
         public IActionResult Create_ActivityAvailabilty([FromBody]BookingSettingModel bookingSettingModel, int activityId, int mode)
         {
             var activity = db.Activity.Find(activityId);
-
+           
             if (activity != null)
             {
                 if (mode == 2)
                 {
-                    
+
                     List<int> nonUpdated_ids = new List<int>();
                     foreach (var aval in bookingSettingModel.avalibilityModels)
                     {
-                        //var startday= aval.activity_Start.Value.DayOfWeek;
-                        //var endday = aval.activity_End.Value.DayOfWeek;
+                       // var startday = aval.activity_Start.Value.DayOfWeek;
+                       // var endday = aval.activity_End.Value.DayOfWeek;
 
-                        var reservation = db.Booking.Where(x => x.avaliability_id == aval.id).Select(x => x.id).ToList();
-                        if (reservation.Count != 0)
-                        {
-                            nonUpdated_ids.Add(aval.id);
-                        }
-                        else
-                        {
-                            //var availbility = db.Avaliability.Find(aval.id);
-                            //now Abiola i need to ensure i change the day of the week part of aval.activity_start to the day sent by Ebuka
-                            //same for end date
-                            var availability = new Core.Web.Models.Avaliability
-                            {
-                               activity_Start = aval.activity_Start.Value.Date,
-                               activity_End = aval.activity_End.Value.Date,
-                               enddate = aval.enddate,
-                               startdate = aval.startdate,
-                               starthour = aval.starthour,
-                               endhour = aval.endhour,
-                            };
-                            if(availability != null)
-                            {
-                                db.Avaliability.Add(availability);
-                                //I disable this temporarily based on ebuka and monsur request
-                                // availbility.group_Price = aval.group_Price;
-                                db.SaveChanges();
-                            }
-                            
-                        }
                         if (aval.id == 0)
                         {//i need to prob this part further                            
                             aval.total_tickets = 0;
@@ -985,18 +961,50 @@ namespace Core.Api.Controllers
                             db.Avaliability.Add(aval);
                             db.SaveChanges();
                         }
-                        //else
-                        //{
-                           
-                        //}
-                        //if (startday.ToString()==aval.startdate && endday.ToString()==aval.enddate)
-                        //{
-
-                        //}
-                        //else
-                        //{
-                        //    return Ok(new { message = "Failed. The Day of the week for the date selected, start day and end day do not match ", availability_ids = nonUpdated_ids });
-                        //}
+                        else
+                        {
+                            var reservation = db.Booking.Where(x => x.avaliability_id == aval.id).Select(x => x.id).ToList();
+                            if (reservation.Count != 0)
+                            {
+                                nonUpdated_ids.Add(aval.id);
+                            }
+                            else
+                            {
+                                var availbility = db.Avaliability.Find(aval.id);
+                                //now Abiola i need to ensure i change the day of the week part of aval.activity_start to the day sent by Ebuka
+                                //same for end date
+                                if(availbility != null)
+                                {
+                                    availbility.activity_Start = aval.activity_Start;
+                                    availbility.activity_End = aval.activity_End;
+                                    availbility.enddate = aval.enddate;
+                                    availbility.startdate = aval.startdate;
+                                    availbility.isForGroup = aval.isForGroup;
+                                    availbility.starthour = aval.starthour;
+                                    availbility.endhour = aval.endhour;
+                                    //I disable this temporarily based on ebuka and monsur request
+                                    // availbility.group_Price = aval.group_Price;
+                                    db.SaveChanges();
+                                }
+                                else
+                                {
+                                    var avanew = new Avaliability
+                                    {
+                                        activity_id= activityId,
+                                       activity_Start = aval.activity_Start,
+                                  activity_End = aval.activity_End,
+                                    enddate = aval.enddate,
+                                    startdate = aval.startdate,
+                                   isForGroup = aval.isForGroup,
+                                   starthour = aval.starthour,
+                                  endhour = aval.endhour,
+                                };
+                                    db.Avaliability.Add(avanew);
+                                    db.SaveChanges();
+                                }
+                                
+                            }
+                        }
 
                     }
                     if (nonUpdated_ids.Count != 0)
@@ -1010,31 +1018,22 @@ namespace Core.Api.Controllers
                     {
                         var startday = aval.activity_Start.Value.DayOfWeek;
                         var endday = aval.activity_End.Value.DayOfWeek;
-                        //if (startday.ToString() == aval.startdate && endday.ToString() == aval.enddate)
-                        //{
-
-                        //}
                         aval.total_tickets = 0;
                         aval.activity_id = activity.id;
-
                         db.Avaliability.Add(aval);
-                        //availbility.enddate = aval.enddate;
-                        //availbility.startdate = aval.startdate;
-                        //availbility.starthour = aval.starthour;
-                        //availbility.endhour = aval.endhour;
                     }
 
                     activity.stepNumber = 7;      // 7 (Create Availabilty)
                     db.SaveChanges();
                 }
 
-                return Ok(new { message="Successfully submitted, Thanks ",activityId = activity.id });
+                return Ok(new { message = "Successfully submitted, Thanks ", activityId = activity.id });
             }
             return BadRequest();
         }
 
         //(Request 8)
-       // [Authorize]
+        // [Authorize]
         [HttpPost]
         [Route("Create_ActivityLength")]
         public IActionResult Create_ActivityLength([FromBody]BookingSettingModel bookingSettingModel, int activityId)

@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Authorization;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace Core.Api.Controllers
 {
@@ -600,52 +601,59 @@ namespace Core.Api.Controllers
 
             }
         }
-
+        [HttpGet]
         [Route("CalenderReservation")]
         [Authorize]
         public IActionResult CalenderReservation(int activityid)
         {
             var activity = db.Activity.Where(a => a.id == activityid);
             if (activity == null)
-                return BadRequest();
-
-            var reservations = db.Avaliability.Where(a => a.activity_id == activityid).Select(c => new reservation
             {
-                totalCapacity = c.Activity.totalCapacity,
-                // Activity_group_price = a.Activity.group_price,
-                activity_Start = c.activity_Start,
-                activity_End = c.activity_End,
-                avaliabilityid = c.id,
-                Availability_group_Price = c.group_Price,
-                isForGroup = c.isForGroup,
-                total_tickets = c.total_tickets,
-                 BookinfInfo = c.Activity.Bookings.Where(g => g.activity_id == activityid).AsEnumerable(),
-                individualCategories = c.Activity.Individual_Categories.Select(s => new IndividualCategoryModel
-                {
-                   id=s.id,
-                    name = s.name,
-                    capacity = s.capacity,
-                    price = s.price,
-                    price_after_discount = s.price_after_discount,
-                    activity_Id = s.activityid
-                }),
-                avaliabilityPricing = c.Avaliability_Pricings.Select(f=> new AvaliabilityPricing {
-                    id =f.id,
-                individualCategoryId= f.individualCategoryId,
-                price= f.price,
-                priceAfterDiscount= f.priceAfterDiscount
-                }).AsEnumerable()
+    return BadRequest();
+            }
 
-            }).ToList();
+            var reservations = db.Booking.Where(a => a.activity_id == activityid).Select(c => new 
+            {
+                Availability = c.Avaliability,
+                totalCapacity = c.Activity.totalCapacity,
+                Bookingpate=c.bookingDate.Date
+            }).Select(df=> new { Acti=df.Availability,Capacity=df.totalCapacity,Book=df.Bookingpate}).AsEnumerable();
+                
+            //    .Select(c => new 
+            //{
+            //    totalCapacity = c.Activity.totalCapacity,
+            //    // Activity_group_price = a.Activity.group_price,
+            //    activity_Start = c.Activity.Avaliabilities.,
+            //    activity_End = c.activity_End,
+            //    avaliabilityid = c.id,
+            //    Availability_group_Price = c.group_Price,
+            //    isForGroup = c.isForGroup,
+            //    total_tickets = c.total_tickets,
+            //     BookinfInfo = db.Booking.Where(g => g.activity_id == activityid).ToList(),
+            //    individualCategories = db.Activity.Where(d=>d.id==activityid).Select(s => DeZerial(s.individual_categories)).AsEnumerable(),
+            //    avaliabilityPricing = c.Avaliability_Pricings.Select(f=> new AvaliabilityPricing {
+            //        id =f.id,
+            //    individualCategoryId= f.individualCategoryId,
+            //    price= f.price,
+            //    priceAfterDiscount= f.priceAfterDiscount
+            //    }).AsEnumerable()
+            //}).ToList();
                 //from a in db.Avaliability.Include(x => x.Avaliability_Pricings)
                 //               where a.activity_id == activityid
                 //               select ;
 
-            return Ok(reservations);
+            return Ok(new { message = "", data = reservations.GroupBy(c => c.Acti) });
 
 
         }
-
+        public dynamic DeZerial(string json)
+        {
+            if (json != null)
+            {
+                return JsonConvert.DeserializeObject(json);
+            }
+            return null;
+        }
         #region g
         [HttpPut("{id}")]
         [Route("EditBooking")]
