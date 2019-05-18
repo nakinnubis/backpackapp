@@ -616,7 +616,8 @@ namespace Core.Api.Controllers
             {
                 Availability = c.Avaliability,
                 totalCapacity = c.Activity.totalCapacity,
-                Bookingpate=c.bookingDate.Date
+                Bookingpate=c.bookingDate.Date,
+                Activity=c.Activity
             }).Select(df=> new { Acti=df.Availability,Capacity=df.totalCapacity,Book=df.Bookingpate}).AsEnumerable();
                 
             //    .Select(c => new 
