@@ -612,13 +612,13 @@ namespace Core.Api.Controllers
     return BadRequest();
             }
 
-            var reservations = db.Booking.Where(a => a.activity_id == activityid).Select(c => new 
+            var reservations = db.Booking.Where(a => a.activity_id == activityid && a.bookingDate!=null).Select(c => new 
             {
-                Availability = c.Avaliability,
+               activity_name = c.Activity.title,
                 totalCapacity = c.Activity.totalCapacity,
-                Bookingpate=c.bookingDate.Date,
-                Activity=c.Activity
-            }).Select(df=> new { Acti=df.Availability,Capacity=df.totalCapacity,Book=df.Bookingpate}).AsEnumerable();
+                Booking= new { c.booking_type,c.bookingDate,c.time_option,c.is_paid},
+                activity_details=new { c.Activity.description,c.Activity.activity_Location,c.Activity.isCompleted,c.Activity.activity_option}
+            }).AsEnumerable();
                 
             //    .Select(c => new 
             //{
@@ -643,7 +643,7 @@ namespace Core.Api.Controllers
                 //               where a.activity_id == activityid
                 //               select ;
 
-            return Ok(new { message = "", data = reservations.GroupBy(c => c.Acti) });
+            return Ok(new { message = "", data = reservations });
 
 
         }

@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text;
 using Core.Api.Helper;
@@ -100,6 +103,8 @@ namespace Core.Api.Controllers
             }
         }
 
+     
+
         public class LoginModel
         {
             public string Email { get; set; }
@@ -126,4 +131,6 @@ namespace Core.Api.Controllers
         }
 
     }
+
+   
 }

@@ -89,7 +89,7 @@ namespace Core.Web.Models
                 //"Server= PD-SRV-DEV01\\SQLEXPRESS;Database=db0fdaa636b2d341f9b5efaa4e018abb22;Trusted_Connection=True;"
                 //Persist Security Info=False;server = db784191071.hosting-data.io; Initial Catalog = db784191071; User ID = dbo784191071;Password = Developer#123
 
-                optionsBuilder.UseSqlServer("Server= PMSL-LAG-OP11\\SQLEXPRESS;Database=db784191071;Trusted_Connection=True;");
+                optionsBuilder.UseSqlServer("Server= PD-SRV-DEV01\\SQLEXPRESS;Database=db784191071;Trusted_Connection=True;");
 
 
 
